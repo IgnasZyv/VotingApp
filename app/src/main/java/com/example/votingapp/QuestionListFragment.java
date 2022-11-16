@@ -41,7 +41,6 @@ public class QuestionListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_question_list, container, false);
-        View v2 = inflater.inflate(R.layout.question_list_item, container, false);
 
         mQuestionRecyclerView = v.findViewById(R.id.rv_questions);
         mQuestionRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -64,10 +63,9 @@ public class QuestionListFragment extends Fragment {
 
         private final TextView mQuestionTitleTextView;
         private final TextView mQuestionDateTextView;
-        private RelativeLayout mExpandableLayout;
-        private RecyclerView mAnswerRecyclerView;
-        private ConstraintLayout mConstraintLayout;
-        private List<Question> mAnswers;
+
+        private final RecyclerView mAnswerRecyclerView;
+
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.question_list_item, parent, false));
@@ -75,9 +73,7 @@ public class QuestionListFragment extends Fragment {
             mQuestionTitleTextView = itemView.findViewById(R.id.tv_item_title);
             mQuestionDateTextView = itemView.findViewById(R.id.tv_item_date);
 
-            mExpandableLayout = itemView.findViewById(R.id.rl_recycler_view);
             mAnswerRecyclerView = itemView.findViewById(R.id.rv_item_answers);
-            mConstraintLayout = itemView.findViewById(R.id.constraint_layout);
         }
 
         public void bind(Question question) {

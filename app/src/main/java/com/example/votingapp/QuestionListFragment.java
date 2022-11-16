@@ -1,18 +1,13 @@
 package com.example.votingapp;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,9 +18,7 @@ import java.util.List;
 public class QuestionListFragment extends Fragment {
 
     private RecyclerView mQuestionRecyclerView;
-    private RecyclerView mAnswerRecyclerView;
-    private QuestionAdapter mAdapter;
-    public Context mContext;
+
 
     public QuestionListFragment() {
         super(R.layout.fragment_question_list);
@@ -55,8 +48,8 @@ public class QuestionListFragment extends Fragment {
         QuestionLab questionLab = QuestionLab.get(getActivity());
         List<Question> questions = questionLab.getQuestions();
 
-        mAdapter = new QuestionAdapter(questions);
-        mQuestionRecyclerView.setAdapter(mAdapter);
+        QuestionAdapter adapter = new QuestionAdapter(questions);
+        mQuestionRecyclerView.setAdapter(adapter);
     }
 
     private class QuestionHolder extends RecyclerView.ViewHolder {

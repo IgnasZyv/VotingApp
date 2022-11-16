@@ -57,7 +57,6 @@ public class QuestionListFragment extends Fragment {
 
         private final TextView mQuestionTitleTextView;
         private final TextView mQuestionDateTextView;
-        private ListView mAnswerListView;
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.question_list_item, parent, false));

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">VotingApp</string>
+    <string name="btn_submit">Submit</string>
+</resources>

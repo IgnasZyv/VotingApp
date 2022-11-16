@@ -45,11 +45,11 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_item_title"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/lv_recycler_view"
+                    app:layout_constraintBottom_toTopOf="@id/rl_recycler_view"
                     android:textAlignment="center"/>
 
-                <LinearLayout
-                    android:id="@+id/lv_recycler_view"
+                <RelativeLayout
+                    android:id="@+id/rl_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
@@ -67,13 +67,13 @@
                         tools:listitem="@layout/answer_list_item"
                         tools:itemCount="3"/>
 
-                </LinearLayout>
+                </RelativeLayout>
 
                 <Button
                     android:id="@+id/btn_submit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/lv_recycler_view"
+                    app:layout_constraintTop_toBottomOf="@id/rl_recycler_view"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:text="@string/btn_submit"/>

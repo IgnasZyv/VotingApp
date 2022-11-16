@@ -1,37 +1,27 @@
 package com.example.votingapp;
 
-import java.util.UUID;
-
 public class Answer {
+    private String mAnswerTitle;
+    private int mAnswerCount;
 
-    private String mAnswer;
-    private UUID mAnswerId;
-    private int mVotes;
-
-    public Answer(String answer) {
-        mAnswer = answer;
-        mAnswerId = UUID.randomUUID();
-        mVotes = 0;
+    public Answer(String answerTitle) {
+        mAnswerTitle = answerTitle;
     }
 
-    public String getAnswer() {
-        return mAnswer;
+    public String getAnswerTitle() {
+        return mAnswerTitle;
     }
 
-    public void setAnswer(String answer) {
-        mAnswer = answer;
+    public void setAnswerTitle(String answerTitle) {
+        mAnswerTitle = answerTitle;
     }
 
-    public UUID getAnswerId() {
-        return mAnswerId;
+    public int getAnswerCount() {
+        return mAnswerCount;
     }
 
-
-    public int getVotes() {
-        return mVotes;
+    public void setAnswerCount(int answerCount) {
+        mAnswerCount = answerCount;
     }
 
-    public void setVotes(int votes) {
-        mVotes = votes;
-    }
 }

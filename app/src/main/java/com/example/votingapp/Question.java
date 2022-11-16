@@ -11,19 +11,18 @@ public class Question {
     private boolean isSelected;
     private Date date;
     private List<String> mAnswers;
+    private boolean isExpanded;
 
     public Question() {
         mAnswers = new ArrayList<>();
         mId = UUID.randomUUID();
         date = new Date();
-        mTitle = "title 1 yea";
         isSelected = false;
     }
 
     public UUID getId() {
         return mId;
     }
-
 
     public String getTitle() {
         return mTitle;
@@ -56,4 +55,9 @@ public class Question {
     public void setAnswers(List<String> answers) {
         mAnswers = answers;
     }
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
 }

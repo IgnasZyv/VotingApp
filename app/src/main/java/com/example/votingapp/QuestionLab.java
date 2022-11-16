@@ -9,7 +9,7 @@ import java.util.UUID;
 public class QuestionLab {
     private static QuestionLab sQuestionLab;
 
-    private List<Question> mQuestions;
+    private final List<Question> mQuestions;
 
     public static QuestionLab get(Context context) {
         if (sQuestionLab == null) {

@@ -18,6 +18,7 @@ import java.util.List;
 public class QuestionListFragment extends Fragment {
 
     private RecyclerView mQuestionRecyclerView;
+    private QuestionAdapter mAdapter;
 
 
     public QuestionListFragment() {
@@ -44,12 +45,20 @@ public class QuestionListFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUi();
+    }
+
     private void updateUi() {
         QuestionLab questionLab = QuestionLab.get(getActivity());
         List<Question> questions = questionLab.getQuestions();
 
-        QuestionAdapter adapter = new QuestionAdapter(questions);
-        mQuestionRecyclerView.setAdapter(adapter);
+        if (mAdapter == null) {
+            mAdapter = new QuestionAdapter(questions);
+            mQuestionRecyclerView.setAdapter(mAdapter);
+        }
     }
 
     private class QuestionHolder extends RecyclerView.ViewHolder {

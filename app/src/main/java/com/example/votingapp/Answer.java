@@ -3,6 +3,7 @@ package com.example.votingapp;
 public class Answer {
     private String mAnswerTitle;
     private int mAnswerCount;
+    private boolean isChecked;
 
     public Answer(String answerTitle) {
         mAnswerTitle = answerTitle;
@@ -22,6 +23,14 @@ public class Answer {
 
     public void setAnswerCount(int answerCount) {
         mAnswerCount = answerCount;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 
 }

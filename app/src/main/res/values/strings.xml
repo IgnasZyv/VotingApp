@@ -2,4 +2,7 @@
     <string name="app_name">VotingApp</string>
     <string name="btn_submit">Submit</string>
     <string name="btn_details">details</string>
+    <string name="expand_button_desc">expand button</string>
+    <string name="profile_picture_desc">profile picture</string>
+    <string name="profile_name">Profile Name</string>
 </resources>

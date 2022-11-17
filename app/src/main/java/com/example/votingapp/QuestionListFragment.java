@@ -2,14 +2,18 @@ package com.example.votingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,12 +67,15 @@ public class QuestionListFragment extends Fragment {
         }
     }
 
-    private class QuestionHolder extends RecyclerView.ViewHolder {
+    private class QuestionHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final TextView mQuestionTitleTextView;
         private final TextView mQuestionDateTextView;
         private final RecyclerView mAnswerRecyclerView;
         private Button mDetailButton;
+
+        private ImageView mExpandLayoutImage;
+        private ConstraintLayout mExpandLayout;
 
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -78,6 +85,16 @@ public class QuestionListFragment extends Fragment {
             mQuestionDateTextView = itemView.findViewById(R.id.tv_item_date);
             mAnswerRecyclerView = itemView.findViewById(R.id.rv_item_answers);
             mDetailButton = itemView.findViewById(R.id.btn_detail);
+
+            mExpandLayout = itemView.findViewById(R.id.constraint_layout);
+            mExpandLayoutImage = itemView.findViewById(R.id.iv_arrow);
+
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            expandableLayout();
         }
 
         public void bind(Question question) {
@@ -107,6 +124,26 @@ public class QuestionListFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
+            });
+
+            mExpandLayout.setVisibility(View.GONE);
+
+            expandableLayout();
+
+        }
+
+
+        private void expandableLayout() {
+            mExpandLayoutImage.setOnClickListener(v -> {
+                if (mExpandLayout.getVisibility() == View.GONE) {
+                    TransitionManager.beginDelayedTransition(mExpandLayout, new AutoTransition());
+                    mExpandLayout.setVisibility(View.VISIBLE);
+                    mExpandLayoutImage.setImageResource(R.drawable.ic_baseline_expand_less_24);
+                } else {
+                    TransitionManager.beginDelayedTransition(mExpandLayout, new AutoTransition());
+                    mExpandLayout.setVisibility(View.GONE);
+                    mExpandLayoutImage.setImageResource(R.drawable.ic_baseline_expand_more_24);
+                }
             });
         }
     }

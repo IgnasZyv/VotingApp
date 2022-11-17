@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,7 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:layout_weight="200">
+    android:layout_margin="12dp"
+    android:padding="12dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -16,56 +16,123 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:cardCornerRadius="6dp"
-            android:layout_margin="16dp"
-            android:layout_weight="40">
+            app:cardCornerRadius="12dp"
+            android:elevation="16dp"
+            android:layout_weight="40"
+            >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                android:id="@+id/constraint_layout">
+                android:layout_height="wrap_content"
+                android:id="@+id/cl_profile">
 
-                <TextView
-                    android:id="@+id/tv_item_title"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/linear_layout_question_details"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    app:layout_constraintBottom_toTopOf="@id/tv_item_date"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Question Title" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tv_item_date"
-                    tools:text="date"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_item_title"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/rl_recycler_view"
-                    android:textAlignment="center"/>
+                    android:paddingTop="12dp"
+                    android:paddingHorizontal="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:id="@+id/tv_profile"
+                        android:src="@drawable/ic_baseline_person_24"
+                        android:contentDescription="@string/profile_picture_desc" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_name"
+                        android:textStyle="bold" />
+
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@+id/linear_layout_question_details"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_margin="12dp">
+
+                    <TextView
+                        android:id="@+id/tv_item_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textStyle="bold"
+                        tools:text="Question Title"
+                        android:layout_gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/tv_item_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="textStart"
+                        tools:text="date" />
+
+                </LinearLayout>
+
+
+                <ImageButton
+                    android:id="@+id/iv_arrow"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end"
+                    android:layout_margin="12dp"
+                    android:contentDescription="@string/expand_button_desc"
+                    android:src="@drawable/ic_baseline_expand_more_24"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="RedundantDescriptionCheck" />
+
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="32dp"
+                android:padding="12dp"
+                android:id="@+id/constraint_layout">
 
                 <RelativeLayout
                     android:id="@+id/rl_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_item_date"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="@id/btn_submit"
-                    android:orientation="horizontal"
-                    android:layout_margin="12dp">
+                    android:orientation="vertical"
+                    android:layout_margin="12dp"
+                    android:layout_marginTop="30dp">
 
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_item_answers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/rv_item_answers"
-                        tools:listitem="@layout/answer_list_item"
-                        tools:itemCount="3"/>
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:layout_marginTop="12dp"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/answer_list_item" />
 
                 </RelativeLayout>
 
@@ -73,19 +140,21 @@
                     android:id="@+id/btn_submit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/rl_recycler_view"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/btn_submit"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:text="@string/btn_submit"/>
+                    app:layout_constraintHorizontal_bias="0.153"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rl_recycler_view" />
 
                 <Button
+                    android:id="@+id/btn_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/btn_detail"
-                    app:layout_constraintTop_toBottomOf="@id/rl_recycler_view"
-                    app:layout_constraintStart_toEndOf="@id/btn_submit"
+                    android:text="@string/btn_details"
+                    app:layout_constraintBottom_toBottomOf="@+id/btn_submit"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:text="@string/btn_details"/>
+                    app:layout_constraintStart_toEndOf="@id/btn_submit" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

@@ -18,14 +18,17 @@ public class QuestionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         Bundle bundle = getIntent().getExtras();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container, QuestionFragment.class, bundle)
+                    .commit();
+
+            getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(R.id.fragment_container_chat, QuestionChatFragment.class, bundle)
                     .commit();
         }
     }

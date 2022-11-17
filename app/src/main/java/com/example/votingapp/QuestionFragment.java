@@ -1,6 +1,8 @@
 package com.example.votingapp;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +18,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class QuestionFragment extends Fragment {
     private Question mQuestion;
-
     private ListView mAnswerListView;
+    private UUID mQuestionId;
+    private List<Answer> mAnswers;
 
     public QuestionFragment() {
         super(R.layout.fragment_question);
@@ -29,7 +35,13 @@ public class QuestionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQuestion = new Question();
+
+        Bundle bundle = getArguments();
+        assert bundle != null;
+        mQuestionId = (UUID) bundle.getSerializable("question");
+        mAnswers = (List<Answer>) bundle.getSerializable("answers");
+        mQuestion = QuestionLab.get(getActivity()).getQuestion(mQuestionId);
+
     }
 
     @Nullable
@@ -42,11 +54,13 @@ public class QuestionFragment extends Fragment {
         questionTitle.setText(mQuestion.getTitle());
 
         mAnswerListView = v.findViewById(R.id.lv_answers);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.select_dialog_singlechoice, mQuestion.getAnswers());
-        mAnswerListView.setAdapter(adapter);
-//        adapter.notifyDataSetChanged();
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mAnswerListView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice,
+                    Arrays.stream(mAnswers.toArray()).map (
+                        answer -> ((Answer) answer).getAnswerTitle())
+                            .toArray(Object[]::new)));
+        }
+        
         mAnswerListView.setOnItemClickListener((parent, view, position, id) -> {
             mAnswerListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             mAnswerListView.setItemChecked(position, true);

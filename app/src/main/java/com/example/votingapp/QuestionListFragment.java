@@ -1,9 +1,11 @@
 package com.example.votingapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -65,8 +67,8 @@ public class QuestionListFragment extends Fragment {
 
         private final TextView mQuestionTitleTextView;
         private final TextView mQuestionDateTextView;
-
         private final RecyclerView mAnswerRecyclerView;
+        private Button mDetailButton;
 
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -74,8 +76,8 @@ public class QuestionListFragment extends Fragment {
 
             mQuestionTitleTextView = itemView.findViewById(R.id.tv_item_title);
             mQuestionDateTextView = itemView.findViewById(R.id.tv_item_date);
-
             mAnswerRecyclerView = itemView.findViewById(R.id.rv_item_answers);
+            mDetailButton = itemView.findViewById(R.id.btn_detail);
         }
 
         public void bind(Question question) {
@@ -97,6 +99,15 @@ public class QuestionListFragment extends Fragment {
             AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, getContext());
             mAnswerRecyclerView.setAdapter(answerListAdapter);
 
+            mDetailButton.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("question", question.getId());
+                bundle.putInt("position", getAdapterPosition());
+                bundle.putSerializable("answers", answers);
+                Intent intent = new Intent(getActivity(), QuestionActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            });
         }
     }
 

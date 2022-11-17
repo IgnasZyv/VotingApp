@@ -1,6 +1,8 @@
 package com.example.votingapp;
 
-public class Answer {
+import java.io.Serializable;
+
+public class Answer implements Serializable {
     private String mAnswerTitle;
     private int mAnswerCount;
     private boolean isChecked;

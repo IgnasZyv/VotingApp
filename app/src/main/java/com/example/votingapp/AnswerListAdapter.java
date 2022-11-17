@@ -43,7 +43,7 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
 
             // Set the click listener for the radio button.
             mRadioButton.setOnClickListener(v -> {
-                //
+                // If the current position does not equal the recent selected position then reset the previous button.
                 if (checkedPosition != getAdapterPosition()) {
                     notifyItemChanged(checkedPosition);
                     checkedPosition = getAdapterPosition();

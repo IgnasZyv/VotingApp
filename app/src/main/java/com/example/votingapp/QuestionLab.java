@@ -3,6 +3,7 @@ package com.example.votingapp;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +21,8 @@ public class QuestionLab {
 
     private QuestionLab(Context context) {
         mQuestions = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            Question question = new Question();
-            question.setTitle("Question #" + i);
+        for (int i = 0; i < 2; i++) {
+            Question question = new Question("Question #" + i, new ArrayList<>(Arrays.asList("Answer 1", "Answer 2", "Answer 3")));
             mQuestions.add(question);
         }
     }

@@ -13,7 +13,7 @@ public class Question {
     private List<String> mAnswers;
     private boolean isExpanded;
 
-    public Question() {
+    public Question(String title, List<String> answers) {
         mAnswers = new ArrayList<>();
         mId = UUID.randomUUID();
         date = new Date();

@@ -1,6 +1,9 @@
 package com.example.votingapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,18 +12,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.GroupHolder> {
 
-    private final List<Group> mGroups;
+    private static List<Group> mGroups;
     Context mContext;
 
     public GroupListAdapter(List<Group> groups) {
         mGroups = groups;
     }
 
-    public static class GroupHolder extends RecyclerView.ViewHolder {
+    public static class GroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView mGroupName;
 
         public GroupHolder(@NonNull View itemView) {
@@ -31,6 +35,20 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Grou
 
         public void bind(Group group) {
             mGroupName.setText(group.getName());
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(v.getContext(), GroupActivity.class);
+//            intent.putExtra("group_page", "group_page");
+
+            Bundle bundle = new Bundle();
+            bundle.putString("group_page", "group_page");
+            bundle.putSerializable("group", (Serializable) mGroups.get(getAdapterPosition()));
+            intent.putExtras(bundle);
+            v.getContext().startActivity(intent);
+
         }
     }
 
@@ -38,7 +56,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Grou
         mContext = context;
         mGroups = groups;
     }
-
 
     @NonNull
     @Override

@@ -76,7 +76,7 @@ public class QuestionFragment extends Fragment {
         submitButton.setOnClickListener(v1 -> {
             int position = mAnswerListView.getCheckedItemPosition();
             if (position != ListView.INVALID_POSITION) {
-                String answer = mQuestion.getAnswers().get(position);
+                String answer = String.valueOf(mQuestion.getAnswers().get(position));
                 mQuestion.setSelected(true);
 //                TextView result = v.findViewById(R.id.tv_submitted_answer);
 //                result.setText(answer);

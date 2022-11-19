@@ -18,20 +18,33 @@ public class GroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        intent.getStringExtra("create_group");
+        Bundle bundle = new Bundle();
 
-        if (savedInstanceState == null && !Objects.equals(intent.getStringExtra("create_group"), "create_group")) {
+        if (intent.getSerializableExtra("group") != null) {
+            Group group = (Group) intent.getSerializableExtra("group");
+            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
+            bundle.putSerializable("group", group);
+        }
+
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container, GroupFragment.class, null)
                     .commit();
-        } else {
+        }
+
+        if (Objects.equals(intent.getStringExtra("create_group"), "create_group")) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .replace(R.id.fragment_container, CreateGroupFragment.class, null)
                     .commit();
         }
+
+        if (Objects.equals(intent.getStringExtra("group_page"), "group_page")) {
+            getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .replace(R.id.fragment_container, GroupPageFragment.class, bundle)
+                    .commit();
+        }
     }
-
-
 }

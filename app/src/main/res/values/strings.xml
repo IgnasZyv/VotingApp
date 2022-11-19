@@ -9,4 +9,8 @@
     <string name="create_group_header">Create Group</string>
     <string name="group_image">Group Image</string>
     <string name="group_name">Group Name</string>
+    <string name="create_question">Create Question</string>
+    <string name="et_choice_hint">Choice</string>
+    <string name="btn_create_question">Create</string>
+    <string name="add_choice">Add Choice</string>
 </resources>

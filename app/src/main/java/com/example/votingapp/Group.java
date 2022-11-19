@@ -1,10 +1,11 @@
 package com.example.votingapp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Group {
+public class Group implements Serializable {
 
     UUID mGroupId;
     private String mName;
@@ -12,6 +13,7 @@ public class Group {
     private List<Question> mQuestions;
 
     public Group(String name) {
+        mQuestions = new ArrayList<>();
         mName = name;
     }
 
@@ -41,5 +43,9 @@ public class Group {
 
     public void setQuestions(List<Question> questions) {
         mQuestions = questions;
+    }
+
+    public void addQuestion(Question question) {
+        mQuestions.add(question);
     }
 }

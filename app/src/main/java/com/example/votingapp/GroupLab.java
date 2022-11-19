@@ -14,7 +14,6 @@ public class GroupLab {
     private GroupLab(Context context) {
         mGroupId = UUID.randomUUID();
         mGroups = new ArrayList<>();
-
     }
 
     public static GroupLab get(Context context) {

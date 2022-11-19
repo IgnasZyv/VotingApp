@@ -7,4 +7,6 @@
     <string name="profile_name">Profile Name</string>
     <string name="et_title_hint">Title</string>
     <string name="create_group_header">Create Group</string>
+    <string name="group_image">Group Image</string>
+    <string name="group_name">Group Name</string>
 </resources>

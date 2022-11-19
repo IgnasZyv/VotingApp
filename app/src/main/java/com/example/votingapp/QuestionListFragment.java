@@ -72,10 +72,10 @@ public class QuestionListFragment extends Fragment {
         private final TextView mQuestionTitleTextView;
         private final TextView mQuestionDateTextView;
         private final RecyclerView mAnswerRecyclerView;
-        private Button mDetailButton;
+        private final Button mDetailButton;
 
-        private ImageView mExpandLayoutImage;
-        private ConstraintLayout mExpandLayout;
+        private final ImageView mExpandLayoutImage;
+        private final ConstraintLayout mExpandLayout;
 
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {

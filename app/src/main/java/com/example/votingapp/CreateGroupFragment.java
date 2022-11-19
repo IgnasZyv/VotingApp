@@ -1,6 +1,7 @@
 package com.example.votingapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,6 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import java.util.Objects;
 
 public class CreateGroupFragment extends Fragment {
 
@@ -29,6 +28,7 @@ public class CreateGroupFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        assert view != null;
         EditText groupName = view.findViewById(R.id.et_title);
         Button createGroupButton = view.findViewById(R.id.btn_submit);
 
@@ -36,6 +36,7 @@ public class CreateGroupFragment extends Fragment {
             Group group = new Group(groupName.getText().toString());
             GroupLab.get(requireActivity()).addGroup(group);
             requireActivity().finish();
+            Log.d("groups", "sent this group name at create" + group.getName());
         });
 
         return view;

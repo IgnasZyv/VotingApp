@@ -33,36 +33,36 @@ public class GroupActivity extends AppCompatActivity {
         firebaseAppCheck.installAppCheckProviderFactory(
                 SafetyNetAppCheckProviderFactory.getInstance());
 
-        // Write a message to the database
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
-        DatabaseReference myRef = database.getReference("message");
-
-
-        // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = Objects.requireNonNull(snapshot.getValue()).toString();
-                Log.w("GroupActivity", "Value is: " + value);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Failed to read value
-                Log.w("myRef", "Failed to read value.", error.toException());
-            }
-        });
+//        // Write a message to the database
+//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
+//        DatabaseReference myRef = database.getReference("message");
+//
+//
+//        // Read from the database
+//        myRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                // This method is called once with the initial value and again
+//                // whenever data at this location is updated.
+//                String value = Objects.requireNonNull(snapshot.getValue()).toString();
+//                Log.w("GroupActivity", "Value is: " + value);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                // Failed to read value
+//                Log.w("myRef", "Failed to read value.", error.toException());
+//            }
+//        });
 
         Intent intent = getIntent();
         Bundle bundle = new Bundle();
 
-        if (intent.getSerializableExtra("group") != null) {
-            Group group = (Group) intent.getSerializableExtra("group");
-            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
-            bundle.putSerializable("group", group);
-        }
+//        if (intent.getSerializableExtra("group") != null) {
+//            Group group = (Group) intent.getSerializableExtra("group");
+//            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
+//            bundle.putSerializable("group", group);
+//        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

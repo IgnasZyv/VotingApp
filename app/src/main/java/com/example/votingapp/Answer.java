@@ -7,6 +7,8 @@ public class Answer implements Serializable {
     private int mAnswerCount;
     private boolean isChecked;
 
+    public Answer(){}
+
     public Answer(String answerTitle) {
         mAnswerTitle = answerTitle;
     }

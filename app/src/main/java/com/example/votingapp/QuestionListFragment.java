@@ -117,13 +117,13 @@ public class QuestionListFragment extends Fragment {
             mAnswerRecyclerView.setAdapter(answerListAdapter);
 
             mDetailButton.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("question", question.getId());
-                bundle.putInt("position", getAdapterPosition());
-                bundle.putSerializable("answers", answers);
-                Intent intent = new Intent(getActivity(), QuestionActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable("question", question.getId());
+//                bundle.putInt("position", getAdapterPosition());
+//                bundle.putSerializable("answers", answers);
+//                Intent intent = new Intent(getActivity(), QuestionActivity.class);
+//                intent.putExtras(bundle);
+//                startActivity(intent);
             });
 
             mExpandLayout.setVisibility(View.GONE);

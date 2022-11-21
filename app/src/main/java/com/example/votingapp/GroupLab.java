@@ -31,13 +31,5 @@ public class GroupLab {
         return mGroups;
     }
 
-    public Group getGroup(UUID id) {
-        for (Group group : mGroups) {
-            if (group.getGroupId().equals(id)) {
-                return group;
-            }
-        }
-        return null;
-    }
 }
 

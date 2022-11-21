@@ -12,6 +12,11 @@ public class Question {
     private Date date;
     private List<Answer> mAnswers;
 
+    public Question(){
+        mId = UUID.randomUUID();
+        date = new Date();
+    }
+
     public Question(String title, List<Answer> answers) {
         mTitle = title;
         mAnswers = answers;

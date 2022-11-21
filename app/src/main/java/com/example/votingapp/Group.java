@@ -5,20 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Group implements Serializable {
+public class Group{
 
-    UUID mGroupId;
     private String mName;
     private ArrayList<String> mMembers;
     private List<Question> mQuestions;
 
-    public Group(String name) {
-        mQuestions = new ArrayList<>();
-        mName = name;
-    }
+    public Group(){}
 
-    public UUID getGroupId() {
-        return mGroupId;
+    public Group(String name) {
+//        this.mQuestions = new ArrayList<>();
+        this.mName = name;
     }
 
     public String getName() {

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,9 +23,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class GroupPageFragment extends Fragment {
 
@@ -34,7 +43,7 @@ public class GroupPageFragment extends Fragment {
     private EditText mQuestionTitle;
     private QuestionAdapter mAdapter;
 
-
+    private DAOQuestion mDAOQuestion;
 
     public GroupPageFragment() {
         super(R.layout.fragment_group_page);
@@ -51,7 +60,7 @@ public class GroupPageFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_group_page, container, false);
 
-
+        mDAOQuestion = new DAOQuestion();
 
         mQuestionRecyclerView = v.findViewById(R.id.rv_questions);
         mQuestionRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -85,7 +94,7 @@ public class GroupPageFragment extends Fragment {
             }
         });
 
-        updateUi();
+//        updateUi();
 
         return v;
     }
@@ -93,7 +102,7 @@ public class GroupPageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateUi();
+//        updateUi();
     }
 
     private void updateUi() {
@@ -110,7 +119,7 @@ public class GroupPageFragment extends Fragment {
             mAdapter = new QuestionAdapter(questions);
             mQuestionRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.notifyItemInserted(questions.size() - 1);
+//            mAdapter.notifyItemInserted(questions.size() - 1);
         }
     }
 
@@ -134,7 +143,6 @@ public class GroupPageFragment extends Fragment {
 
         String questionTitle = mQuestionTitle.getText().toString();
 
-
         for (int i = 0; i < mAddAnswerLayout.getChildCount(); i++) {
             View view = mAddAnswerLayout.getChildAt(i);
             if (view instanceof EditText) {
@@ -144,12 +152,31 @@ public class GroupPageFragment extends Fragment {
             }
         }
 
+
+
         Question question = new Question(questionTitle, choices);
-        group.addQuestion(question);
 
-        QuestionLab questionLab = QuestionLab.get(getActivity());
-        questionLab.addQuestion(question);
+//        mDAOQuestion.get().child(Group.class.getSimpleName()).child(group.getId()).setValue(question).addOnSuccessListener(aVoid -> {
+//            Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
+//            group.addQuestion(question);
+//        }).addOnFailureListener(e -> {
+//            Toast.makeText(getActivity(), "Question not created", Toast.LENGTH_SHORT).show();
+//        });
 
+        mDAOQuestion.add(question, group.getId()).addOnSuccessListener(success -> {
+            Log.w("CreateQuestionFragment", "Question created successfully");
+        }).addOnFailureListener(failure -> {
+            Log.w("CreateQuestionFragment", "Question creation failed");
+        });
+
+
+//        group.addQuestion(question);
+//        Group group = new Group(groupName.getText().toString());
+//        daoGroup.add(group).addOnSuccessListener(success -> {
+//            Log.w("CreateGroupFragment", "Group created successfully");
+//        }).addOnFailureListener(failure -> {
+//            Log.w("CreateGroupFragment", "Group creation failed");
+//        });
     }
 
 

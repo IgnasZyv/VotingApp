@@ -7,18 +7,24 @@ import java.util.UUID;
 
 public class Group implements Serializable {
 
-    UUID mGroupId;
     private String mName;
+    private String mId;
     private ArrayList<String> mMembers;
     private List<Question> mQuestions;
 
+    public Group(){}
+
     public Group(String name) {
-        mQuestions = new ArrayList<>();
-        mName = name;
+        this.mName = name;
+        this.mId = UUID.randomUUID().toString();
     }
 
-    public UUID getGroupId() {
-        return mGroupId;
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 
     public String getName() {
@@ -46,6 +52,9 @@ public class Group implements Serializable {
     }
 
     public void addQuestion(Question question) {
+        if (mQuestions == null) {
+            mQuestions = new ArrayList<>();
+        }
         mQuestions.add(question);
     }
 }

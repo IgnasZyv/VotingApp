@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.util.List;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.GroupHolder> {
-
     private static List<Group> mGroups;
     Context mContext;
 
@@ -30,7 +29,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Grou
         public GroupHolder(@NonNull View itemView) {
             super(itemView);
             mGroupName = itemView.findViewById(R.id.tv_name);
-
         }
 
         public void bind(Group group) {
@@ -67,11 +65,18 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Grou
     @Override
     public void onBindViewHolder(@NonNull GroupHolder holder, int position) {
         Group group = mGroups.get(position);
+
+
+
         holder.bind(group);
     }
 
     @Override
     public int getItemCount() {
-        return mGroups.size();
+        if (mGroups != null) {
+            return mGroups.size();
+        } else {
+            return 0;
+        }
     }
 }

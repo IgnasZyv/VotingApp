@@ -11,11 +11,11 @@ public class DAOQuestion {
 
     public DAOQuestion() {
         FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
-        mDatabase = db.getReference(Question.class.getSimpleName());
+        mDatabase = db.getReference(Group.class.getSimpleName());
     }
 
-    public Task<Void> add(Question question) {
-        return mDatabase.push().setValue(question);
+    public Task<Void> add(Question question, String groupId) {
+        return mDatabase.child(groupId).child(Question.class.getSimpleName()).child(question.getId()).setValue(question);
     }
 
     public Task<Void> update(String key, HashMap<String, Object> hashMap) {
@@ -24,5 +24,9 @@ public class DAOQuestion {
 
     public Task<Void> delete(String key) {
         return mDatabase.child(key).removeValue();
+    }
+
+    public DatabaseReference get() {
+        return mDatabase;
     }
 }

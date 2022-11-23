@@ -2,32 +2,35 @@ package com.example.votingapp;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class Question {
-
-    private final UUID mId;
     private String mTitle;
     private boolean isSelected;
     private Date date;
     private List<Answer> mAnswers;
 
-    public Question(){
-        mId = UUID.randomUUID();
-        date = new Date();
-    }
+
+    private String mId;
+
+    public Question(){}
 
     public Question(String title, List<Answer> answers) {
-        mTitle = title;
-        mAnswers = answers;
-        mId = UUID.randomUUID();
-        date = new Date();
-        isSelected = false;
+        this.mTitle = title;
+        this.mAnswers = answers;
+        this.mId = UUID.randomUUID().toString();
+        this.date = new Date();
+        this.isSelected = false;
     }
 
 
-    public UUID getId() {
+    public String getId() {
         return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 
     public String getTitle() {
@@ -54,7 +57,6 @@ public class Question {
     public void setAnswers(List<Answer> answers) {
         mAnswers = answers;
     }
-
 
 
 }

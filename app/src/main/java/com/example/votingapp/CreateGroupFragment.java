@@ -37,7 +37,6 @@ public class CreateGroupFragment extends Fragment {
 
         DAOGroup daoGroup = new DAOGroup();
         createGroupButton.setOnClickListener(view1 -> {
-
             Group group = new Group(groupName.getText().toString());
             daoGroup.add(group).addOnSuccessListener(success -> {
                 Log.w("CreateGroupFragment", "Group created successfully");

@@ -16,7 +16,7 @@ public class DAOGroup {
     }
 
     public Task<Void> add(Group group) {
-        return mDatabase.push().setValue(group);
+        return mDatabase.child(group.getId()).setValue(group);
     }
 
     public Task<Void> update(String key, HashMap<String, Object> hashMap) {

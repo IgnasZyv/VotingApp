@@ -20,6 +20,8 @@ import java.util.Objects;
 
 public class GroupActivity extends AppCompatActivity {
 
+    public static String groupId;
+
     public GroupActivity() {
         super(R.layout.activity_fragment);
     }
@@ -57,12 +59,13 @@ public class GroupActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = new Bundle();
+        groupId = intent.getStringExtra("groupId");
 
-//        if (intent.getSerializableExtra("group") != null) {
-//            Group group = (Group) intent.getSerializableExtra("group");
-//            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
-//            bundle.putSerializable("group", group);
-//        }
+        if (intent.getSerializableExtra("group") != null) {
+            Group group = (Group) intent.getSerializableExtra("group");
+            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
+            bundle.putSerializable("group", group);
+        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

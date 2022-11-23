@@ -5,17 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Group{
+public class Group implements Serializable {
 
     private String mName;
+    private String mId;
     private ArrayList<String> mMembers;
     private List<Question> mQuestions;
 
     public Group(){}
 
     public Group(String name) {
-//        this.mQuestions = new ArrayList<>();
         this.mName = name;
+        this.mId = UUID.randomUUID().toString();
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 
     public String getName() {
@@ -43,6 +52,9 @@ public class Group{
     }
 
     public void addQuestion(Question question) {
+        if (mQuestions == null) {
+            mQuestions = new ArrayList<>();
+        }
         mQuestions.add(question);
     }
 }

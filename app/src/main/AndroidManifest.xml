@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +15,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VotingApp"
         tools:targetApi="31">
+
+<!--        <activity-->
+<!--            android:name="com.firebase.ui.auth.ui.email.EmailHintContainerActivity"-->
+<!--            android:launchMode="singleTask"-->
+<!--            android:theme="@style/FirebaseUI.SignIn"-->
+<!--            android:windowSoftInputMode="adjustResize|stateHidden">-->
+<!--            <meta-data-->
+<!--                android:name="com.firebaseui.authMethod"-->
+<!--                android:value="email" />-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name="com.firebase.ui.auth.ui.idp.SingleSignInActivity"-->
+<!--            android:launchMode="singleTask"-->
+<!--            android:theme="@style/FirebaseUI.SignIn"-->
+<!--            android:windowSoftInputMode="adjustResize|stateHidden">-->
+<!--            <meta-data-->
+<!--                android:name="com.firebaseui.authMethod"-->
+<!--                android:value="anonymous" />-->
+<!--        </activity>-->
 
         <activity android:name=".GroupActivity"
             android:exported="true">

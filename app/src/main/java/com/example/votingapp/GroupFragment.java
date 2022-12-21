@@ -101,6 +101,18 @@ public class GroupFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("group_name", "group_name");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUi();
+    }
+
 
     private void updateUi() {
 

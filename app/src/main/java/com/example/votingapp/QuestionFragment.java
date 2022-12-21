@@ -28,7 +28,7 @@ public class QuestionFragment extends Fragment {
     private Question mQuestion;
     private ListView mAnswerListView;
     private List<Answer> mAnswers;
-
+    private Group group;
 
 
     public QuestionFragment() {
@@ -41,10 +41,10 @@ public class QuestionFragment extends Fragment {
 
         Bundle bundle = getArguments();
         assert bundle != null;
-        UUID questionId = (UUID) bundle.getSerializable("question");
+        String questionId = bundle.getString("question");
         mAnswers = (List<Answer>) bundle.getSerializable("answers");
-        mQuestion = QuestionLab.get(getActivity()).getQuestion(questionId);
-
+        group = (Group) bundle.getSerializable("group");
+        mQuestion = group.getQuestion(questionId);
 
     }
 

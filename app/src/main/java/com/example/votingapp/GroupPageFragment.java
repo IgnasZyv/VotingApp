@@ -95,6 +95,34 @@ public class GroupPageFragment extends Fragment {
         });
 
 //        updateUi();
+        Bundle bundle = getArguments();
+        assert bundle != null;
+        Group group = (Group) bundle.getSerializable("group");
+
+        mDAOQuestion.get(group.getId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Question> questions = new ArrayList<>();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Question question = dataSnapshot.getValue(Question.class);
+                    questions.add(question);
+                }
+                if (mAdapter == null) {
+                    mAdapter = new QuestionAdapter(questions);
+                    mQuestionRecyclerView.setAdapter(mAdapter);
+                } else {
+                    mAdapter.setQuestions(questions);
+                    mAdapter.notifyItemInserted(questions.size() - 1);
+                }
+                group.setQuestions(questions);
+//                mAdapter.notifyItemInserted(questions.size() - 1);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return v;
     }
@@ -113,7 +141,6 @@ public class GroupPageFragment extends Fragment {
 
 //        List<Question> questions = group.getQuestions();
         List<Question> questions = group.getQuestions();
-
 
         if (mAdapter == null) {
             mAdapter = new QuestionAdapter(questions);
@@ -152,8 +179,6 @@ public class GroupPageFragment extends Fragment {
             }
         }
 
-
-
         Question question = new Question(questionTitle, choices);
 
 //        mDAOQuestion.get().child(Group.class.getSimpleName()).child(group.getId()).setValue(question).addOnSuccessListener(aVoid -> {
@@ -164,9 +189,10 @@ public class GroupPageFragment extends Fragment {
 //        });
 
         mDAOQuestion.add(question, group.getId()).addOnSuccessListener(success -> {
-            Log.w("CreateQuestionFragment", "Question created successfully");
+            Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
+            group.addQuestion(question);
         }).addOnFailureListener(failure -> {
-            Log.w("CreateQuestionFragment", "Question creation failed");
+            Toast.makeText(getActivity(), "Question not created", Toast.LENGTH_SHORT).show();
         });
 
 
@@ -227,8 +253,9 @@ public class GroupPageFragment extends Fragment {
             mAnswerRecyclerView.setAdapter(answerListAdapter);
 
             mDetailButton.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("question", question.getId());
+                Bundle bundle = getArguments();
+                assert bundle != null;
+                bundle.putString("question", question.getId());
                 bundle.putInt("position", getAdapterPosition());
                 bundle.putSerializable("answers", answers);
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
@@ -286,6 +313,11 @@ public class GroupPageFragment extends Fragment {
             } else {
                 return mQuestions.size();
             }
+        }
+
+        public void setQuestions(List<Question> questions) {
+            mQuestions.clear();
+            mQuestions.addAll(questions);
         }
     }
 }

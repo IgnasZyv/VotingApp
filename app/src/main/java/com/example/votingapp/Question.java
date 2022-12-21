@@ -37,6 +37,9 @@ public class Question {
         return mTitle;
     }
 
+    public void setTitle(String title) {
+        mTitle = title;
+    }
 
     public void setSelected(boolean selected) {
         isSelected = selected;
@@ -57,6 +60,5 @@ public class Question {
     public void setAnswers(List<Answer> answers) {
         mAnswers = answers;
     }
-
 
 }

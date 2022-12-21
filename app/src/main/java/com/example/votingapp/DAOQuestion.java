@@ -26,7 +26,7 @@ public class DAOQuestion {
         return mDatabase.child(key).removeValue();
     }
 
-    public DatabaseReference get() {
-        return mDatabase;
+    public DatabaseReference get(String groupId) {
+        return mDatabase.child(groupId).child(Question.class.getSimpleName());
     }
 }

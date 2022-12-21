@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+app/src/main/java/com/example/votingapp/AuthActivity.java
+
+app/src/main/res/layout/activity_auth.xml

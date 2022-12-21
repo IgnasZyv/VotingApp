@@ -57,4 +57,13 @@ public class Group implements Serializable {
         }
         mQuestions.add(question);
     }
+
+    public Question getQuestion(String id) {
+        for (Question question : mQuestions) {
+            if (question.getId().equals(id)) {
+                return question;
+            }
+        }
+        return null;
+    }
 }

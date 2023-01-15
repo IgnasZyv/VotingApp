@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -99,30 +100,34 @@ public class GroupPageFragment extends Fragment {
         assert bundle != null;
         Group group = (Group) bundle.getSerializable("group");
 
-        mDAOQuestion.get(group.getId()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<Question> questions = new ArrayList<>();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Question question = dataSnapshot.getValue(Question.class);
-                    questions.add(question);
-                }
-                if (mAdapter == null) {
-                    mAdapter = new QuestionAdapter(questions);
-                    mQuestionRecyclerView.setAdapter(mAdapter);
-                } else {
-                    mAdapter.setQuestions(questions);
-                    mAdapter.notifyItemInserted(questions.size() - 1);
-                }
-                group.setQuestions(questions);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            mDAOQuestion.get(group.getId()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) { // When data changes
+                    List<Question> questions = new ArrayList<>();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) { // for each question
+                        Question question = dataSnapshot.getValue(Question.class);
+                        questions.add(question);
+                    }
+                    if (mAdapter == null) {
+                        mAdapter = new QuestionAdapter(questions);
+                        mQuestionRecyclerView.setAdapter(mAdapter);
+                    } else {
+                        mAdapter.setQuestions(questions);
+                        mAdapter.notifyItemInserted(questions.size() - 1);
+                    }
+                    group.setQuestions(questions);
 //                mAdapter.notifyItemInserted(questions.size() - 1);
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.d("GroupPageFrag", "onCancelled: " + error.getMessage());
+                }
+            });
+        }
+
 
         return v;
     }
@@ -137,7 +142,6 @@ public class GroupPageFragment extends Fragment {
         Bundle bundle = getArguments();
         assert bundle != null;
         Group group = (Group) bundle.getSerializable("group");
-        QuestionLab questionLab = QuestionLab.get(getActivity());
 
 //        List<Question> questions = group.getQuestions();
         List<Question> questions = group.getQuestions();
@@ -181,13 +185,6 @@ public class GroupPageFragment extends Fragment {
 
         Question question = new Question(questionTitle, choices);
 
-//        mDAOQuestion.get().child(Group.class.getSimpleName()).child(group.getId()).setValue(question).addOnSuccessListener(aVoid -> {
-//            Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
-//            group.addQuestion(question);
-//        }).addOnFailureListener(e -> {
-//            Toast.makeText(getActivity(), "Question not created", Toast.LENGTH_SHORT).show();
-//        });
-
         mDAOQuestion.add(question, group.getId()).addOnSuccessListener(success -> {
             Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
             group.addQuestion(question);
@@ -195,14 +192,6 @@ public class GroupPageFragment extends Fragment {
             Toast.makeText(getActivity(), "Question not created", Toast.LENGTH_SHORT).show();
         });
 
-
-//        group.addQuestion(question);
-//        Group group = new Group(groupName.getText().toString());
-//        daoGroup.add(group).addOnSuccessListener(success -> {
-//            Log.w("CreateGroupFragment", "Group created successfully");
-//        }).addOnFailureListener(failure -> {
-//            Log.w("CreateGroupFragment", "Group creation failed");
-//        });
     }
 
 

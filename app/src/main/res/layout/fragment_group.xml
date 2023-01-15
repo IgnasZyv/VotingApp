@@ -10,9 +10,10 @@
         android:layout_width="0dp"
         android:layout_height="53dp"
         android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/ib_sign_out"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btn_add_group">
+        android:layout_marginEnd="16dp">
 
         <Button
             android:id="@+id/btn_list_items"
@@ -46,15 +47,26 @@
 
     <ImageButton
         android:id="@+id/btn_add_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_baseline_post_add_24"
         app:layout_constraintBottom_toTopOf="@+id/rv_group"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/linear_layout"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_baseline_post_add_24"/>
+        android:contentDescription="@string/add_group" />
+
+    <ImageButton
+        android:id="@+id/ib_sign_out"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_group"
+        app:layout_constraintEnd_toStartOf="@+id/btn_add_group"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_action_name"
+        android:contentDescription="@string/log_out"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

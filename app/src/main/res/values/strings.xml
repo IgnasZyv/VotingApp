@@ -13,4 +13,6 @@
     <string name="et_choice_hint">Choice</string>
     <string name="btn_create_question">Create</string>
     <string name="add_choice">Add Choice</string>
+    <string name="add_group">Add Group</string>
+    <string name="log_out">Log out</string>
 </resources>

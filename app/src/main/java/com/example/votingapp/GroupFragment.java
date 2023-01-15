@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GroupFragment extends Fragment {
     public GroupListAdapter mAdapter;
@@ -40,7 +43,6 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDAOGroup = new DAOGroup();
     }
 
     private void loadData() {
@@ -67,6 +69,8 @@ public class GroupFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_group, container, false);
 
+        mDAOGroup = new DAOGroup();
+
         mGroups = new ArrayList<>();
 
         mGroupRecyclerView = v.findViewById(R.id.rv_group);
@@ -75,6 +79,8 @@ public class GroupFragment extends Fragment {
         mGroupRecyclerView.setAdapter(mGroupListAdapter);
 
         ImageButton createGroupButton = v.findViewById(R.id.btn_add_group);
+        ImageButton signOutButton = v.findViewById(R.id.ib_sign_out);
+
         Button listButton = v.findViewById(R.id.btn_list_items);
 
         listButton.setOnClickListener(view -> {
@@ -88,16 +94,25 @@ public class GroupFragment extends Fragment {
             startActivity(intent);
         });
 
-
+        signOutButton.setOnClickListener(v1 -> {
+            AuthUI.getInstance().signOut(requireContext())
+                    .addOnCompleteListener(task -> {
+                        Intent intentLogOut = new Intent(getActivity(), LogInActivity.class);
+                        intentLogOut.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // clear the back stack
+                        startActivity(intentLogOut);
+                    });
+        });
 
 
         if (savedInstanceState != null) {
             Log.d("GroupFragment", "onViewStateRestored: " + savedInstanceState.getString("group_name"));
         }
 
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            updateUi();
 
-        updateUi();
-
+        }
         return v;
     }
 
@@ -107,11 +122,11 @@ public class GroupFragment extends Fragment {
         outState.putString("group_name", "group_name");
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateUi();
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        updateUi();
+//    }
 
 
     private void updateUi() {

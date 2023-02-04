@@ -6,6 +6,8 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -45,6 +47,8 @@ public class GroupPageFragment extends Fragment {
     private QuestionAdapter mAdapter;
 
     private DAOQuestion mDAOQuestion;
+    private ValueEventListener mValueEventListener;
+    private Group mGroup;
 
     public GroupPageFragment() {
         super(R.layout.fragment_group_page);
@@ -95,17 +99,24 @@ public class GroupPageFragment extends Fragment {
             }
         });
 
-//        updateUi();
+        updateUi();
+
+        return v;
+    }
+
+    private void updateUi() {
+
+        Log.d("pageFragment", "updateUi: called");
         Bundle bundle = getArguments();
         assert bundle != null;
-        Group group = (Group) bundle.getSerializable("group");
+        mGroup = (Group) bundle.getSerializable("group");
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            mDAOQuestion.get(group.getId()).addValueEventListener(new ValueEventListener() {
+            mValueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) { // When data changes
-                    List<Question> questions = new ArrayList<>();
+                    ArrayList<Question> questions = new ArrayList<>();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) { // for each question
                         Question question = dataSnapshot.getValue(Question.class);
                         questions.add(question);
@@ -115,42 +126,28 @@ public class GroupPageFragment extends Fragment {
                         mQuestionRecyclerView.setAdapter(mAdapter);
                     } else {
                         mAdapter.setQuestions(questions);
-                        mAdapter.notifyItemInserted(questions.size() - 1);
+                        mAdapter.notifyDataSetChanged();
                     }
-                    group.setQuestions(questions);
-//                mAdapter.notifyItemInserted(questions.size() - 1);
+                    mGroup.setQuestions(questions);
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     Log.d("GroupPageFrag", "onCancelled: " + error.getMessage());
                 }
-            });
+            };
+
+            mDAOQuestion.get(mGroup.getId()).addValueEventListener(mValueEventListener);
+
         }
 
-
-        return v;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-//        updateUi();
-    }
-
-    private void updateUi() {
-        Bundle bundle = getArguments();
-        assert bundle != null;
-        Group group = (Group) bundle.getSerializable("group");
-
-//        List<Question> questions = group.getQuestions();
-        List<Question> questions = group.getQuestions();
-
-        if (mAdapter == null) {
-            mAdapter = new QuestionAdapter(questions);
-            mQuestionRecyclerView.setAdapter(mAdapter);
-        } else {
-//            mAdapter.notifyItemInserted(questions.size() - 1);
+    public void onPause() {
+        super.onPause();
+        if (mValueEventListener != null) {
+            mDAOQuestion.get(mGroup.getId()).removeEventListener(mValueEventListener);
         }
     }
 
@@ -191,6 +188,9 @@ public class GroupPageFragment extends Fragment {
         }).addOnFailureListener(failure -> {
             Toast.makeText(getActivity(), "Question not created", Toast.LENGTH_SHORT).show();
         });
+
+        mQuestionTitle.refreshDrawableState();
+        mAddAnswerLayout.refreshDrawableState();
 
     }
 

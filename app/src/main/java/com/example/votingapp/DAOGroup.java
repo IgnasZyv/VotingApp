@@ -15,7 +15,8 @@ public class DAOGroup {
     public DAOGroup() {
         FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        mDatabase = db.getReference(Group.class.getSimpleName()).child(Objects.requireNonNull(auth.getUid()));
+//        mDatabase = db.getReference(Group.class.getSimpleName()).child(Objects.requireNonNull(auth.getUid()));
+        mDatabase = db.getReference().child(Group.class.getSimpleName());
     }
 
     public Task<Void> add(Group group) {
@@ -31,6 +32,6 @@ public class DAOGroup {
     }
 
     public Query get() {
-        return mDatabase.orderByKey();
+        return mDatabase;
     }
 }

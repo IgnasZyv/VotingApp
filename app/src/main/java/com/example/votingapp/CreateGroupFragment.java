@@ -13,7 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.HashMap;
+import java.util.Objects;
 
 public class CreateGroupFragment extends Fragment {
 
@@ -35,30 +40,26 @@ public class CreateGroupFragment extends Fragment {
         EditText groupName = view.findViewById(R.id.et_title);
         Button createGroupButton = view.findViewById(R.id.btn_submit);
 
+
+
         DAOGroup daoGroup = new DAOGroup();
         createGroupButton.setOnClickListener(view1 -> {
             Group group = new Group(groupName.getText().toString());
+            group.addAdministrator(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
             daoGroup.add(group).addOnSuccessListener(success -> {
                 Log.w("CreateGroupFragment", "Group created successfully");
+
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
+                DatabaseReference userGroupsRef = db.getReference("UserGroups").child(Objects.requireNonNull(auth.getUid()));
+                HashMap<String, Boolean> groupMap = new HashMap<>();
+                groupMap.put(group.getId(), true);
+                userGroupsRef.child(group.getId()).setValue(groupMap);
+
             }).addOnFailureListener(failure -> {
                 Log.w("CreateGroupFragment", "Group creation failed");
             });
 
-//            HashMap<String, Object> hashMap = new HashMap<>();
-//            hashMap.put("name", groupName.getText().toString());
-//            daoGroup.update("-NHLWdEozDWLWCaDKgnP", hashMap).addOnSuccessListener(success -> {
-//                Toast.makeText(this.getContext(), "Record is Updated", Toast.LENGTH_SHORT).show();
-//            });
-
-//            HashMap<String, Object> hashMap = new HashMap<>();
-//            hashMap.put("name", groupName.getText().toString());
-//            daoGroup.remove("-NHLWdEozDWLWCaDKgnP").addOnSuccessListener(success -> {
-//                Toast.makeText(this.getContext(), "Record is Updated", Toast.LENGTH_SHORT).show();
-//            });
-
-//            GroupLab.get(requireActivity()).addGroup(group);
-//            requireActivity().finish();
-//            Log.d("groups", "sent this group name at create" + group.getName());
 
             requireActivity().finish();
         });

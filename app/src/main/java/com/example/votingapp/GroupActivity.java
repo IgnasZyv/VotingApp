@@ -2,8 +2,15 @@ package com.example.votingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -12,6 +19,8 @@ import java.util.Objects;
 public class GroupActivity extends AppCompatActivity {
 
     public static String groupId;
+    private Group mGroup;
+    private MenuProvider mMenuProvider;
 
 
     public GroupActivity() {
@@ -22,55 +31,55 @@ public class GroupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             Intent intent = new Intent(this, LogInActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 
-//        FirebaseApp.initializeApp(/*context=*/ this);
-//        FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
-//        firebaseAppCheck.installAppCheckProviderFactory(
-//                SafetyNetAppCheckProviderFactory.getInstance());
-
-//        // Write a message to the database
-//        FirebaseDatabase database = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
-//        DatabaseReference myRef = database.getReference("message");
-//
-//
-//        // Read from the database
-//        myRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                // This method is called once with the initial value and again
-//                // whenever data at this location is updated.
-//                String value = Objects.requireNonNull(snapshot.getValue()).toString();
-//                Log.w("GroupActivity", "Value is: " + value);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                // Failed to read value
-//                Log.w("myRef", "Failed to read value.", error.toException());
-//            }
-//        });
 
 
         Intent intent = getIntent();
         Bundle bundle = new Bundle();
         groupId = intent.getStringExtra("groupId");
-//        bundle.putSerializable("mUser", (Serializable) mUser);
 
         if (intent.getSerializableExtra("group") != null) {
-            Group group = (Group) intent.getSerializableExtra("group");
-            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
-            bundle.putSerializable("group", group);
+            mGroup = (Group) intent.getSerializableExtra("group");
+            Objects.requireNonNull(getSupportActionBar()).setTitle(mGroup.getName());
+            bundle.putSerializable("group", mGroup);
         }
 
-        if (savedInstanceState == null) {
+        if (bundle.getSerializable("group") == null) {
+
+            addMenuProvider(new MenuProvider() {
+                @Override
+                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                    menuInflater.inflate(R.menu.home_menu, menu);
+                }
+
+                @Override
+                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+
+                    if (menuItem.getItemId() == R.id.log_out) {
+                        FirebaseAuth.getInstance().signOut();
+                        Intent intent = new Intent(GroupActivity.this, LogInActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        return true;
+                    }
+
+                    return false;
+                }
+            });
+
+
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container, GroupFragment.class, bundle)
+
                     .commit();
         }
 
@@ -82,6 +91,28 @@ public class GroupActivity extends AppCompatActivity {
         }
 
         if (Objects.equals(intent.getStringExtra("group_page"), "group_page")) {
+            myToolbar.getMenu().clear();
+
+            addMenuProvider(new MenuProvider() {
+                @Override
+                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                    menuInflater.inflate(R.menu.group_page_menu, menu);
+                }
+
+                @Override
+                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+
+                    if (menuItem.getItemId() == R.id.invite) {
+                        getSupportFragmentManager().beginTransaction()
+                                .setReorderingAllowed(true)
+                                .replace(R.id.fragment_container, InviteFragment.class, bundle)
+                                .commit();
+                    }
+
+                    return false;
+                }
+            });
+
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .replace(R.id.fragment_container, GroupPageFragment.class, bundle)

@@ -32,8 +32,8 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Grou
         }
 
         public void bind(Group group) {
-            mGroupName.setText(group.getName());
-            itemView.setOnClickListener(this);
+                mGroupName.setText(group.getName());
+                itemView.setOnClickListener(this);
         }
 
         @Override

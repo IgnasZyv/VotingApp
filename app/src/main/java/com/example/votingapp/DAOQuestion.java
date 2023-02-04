@@ -14,7 +14,7 @@ public class DAOQuestion {
     public DAOQuestion() {
         FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        mDatabase = db.getReference(Group.class.getSimpleName()).child(Objects.requireNonNull(auth.getUid()));
+        mDatabase = db.getReference(Group.class.getSimpleName());
     }
 
     public Task<Void> add(Question question, String groupId) {

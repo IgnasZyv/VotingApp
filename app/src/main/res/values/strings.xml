@@ -15,4 +15,6 @@
     <string name="add_choice">Add Choice</string>
     <string name="add_group">Add Group</string>
     <string name="log_out">Log out</string>
+    <string name="Invite">Invite</string>
+    <string name="details">Details</string>
 </resources>

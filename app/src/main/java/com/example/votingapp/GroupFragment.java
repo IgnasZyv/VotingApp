@@ -18,9 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -134,27 +138,83 @@ public class GroupFragment extends Fragment {
         if (mAdapter == null) {
             mAdapter = new GroupListAdapter(mGroups);
             mGroupRecyclerView.setAdapter(mAdapter);
-        }
+    }
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mGroupRecyclerView.setLayoutManager(layoutManager);
         mGroupRecyclerView.setHasFixedSize(true);
-        
-        mDAOGroup.get().addValueEventListener(new ValueEventListener() {
+
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
+//        DatabaseReference userGroupsRef = db.getReference("UserGroups").child(Objects.requireNonNull(auth.getUid()));
+
+
+//        mDAOGroup.get().addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                mGroups.clear();
+//                for (DataSnapshot ds : snapshot.getChildren()) {
+//                    Group group = ds.getValue(Group.class);
+//                    mGroups.add(group);
+//                }
+//                mAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.e("GroupFragment", "loadPost:onCancelled", error.toException());
+//            }
+//        });
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert currentUser != null;
+        String userId = currentUser.getUid();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
+        DatabaseReference userGroupsRef = database.getReference("UserGroups").child(userId);
+
+        DatabaseReference groupRef = database.getReference("Group");
+        ValueEventListener userGroupsListener = new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 mGroups.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Group group = ds.getValue(Group.class);
-                    mGroups.add(group);
+                int childrenCount = (int) dataSnapshot.getChildrenCount();
+                final int[] groupCount = {0};
+                for (DataSnapshot groupIdSnapshot : dataSnapshot.getChildren()) {
+                    String groupId = groupIdSnapshot.getKey();
+                    assert groupId != null;
+                    DatabaseReference specificGroupRef = groupRef.child(groupId);
+                    specificGroupRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getValue() != null) {
+                                Group group = dataSnapshot.getValue(Group.class);
+                                mGroups.add(group);
+
+                                groupCount[0]++;
+                                if (groupCount[0] == childrenCount) {
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.e("GroupFragment", "loadPost:onCancelled", databaseError.toException());
+                        }
+                    });
                 }
-                mAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("GroupFragment", "loadPost:onCancelled", error.toException());
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("GroupFragment", "loadPost:onCancelled", databaseError.toException());
             }
-        });
+        };
+
+        userGroupsRef.addValueEventListener(userGroupsListener);
+
     }
+
 }

@@ -2,7 +2,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="@string/Invite"
+    <item android:title="@string/invite_code"
         android:id="@+id/invite"/>
 
     <item android:title="@string/details"

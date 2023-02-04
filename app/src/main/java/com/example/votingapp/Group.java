@@ -6,6 +6,7 @@ import com.google.firebase.database.PropertyName;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class Group implements Serializable {
@@ -15,6 +16,8 @@ public class Group implements Serializable {
     private ArrayList<String> mMembers;
     private ArrayList<String> mAdministrators;
     private ArrayList<Question> mQuestions;
+    private int mInviteCode = 0;
+    private int mAdminInviteCode = 0;
 
     public Group(){}
 
@@ -24,7 +27,10 @@ public class Group implements Serializable {
         this.mMembers = new ArrayList<>();
         this.mAdministrators = new ArrayList<>();
         this.mQuestions = new ArrayList<>();
+        this.mInviteCode = getInviteCode();
+        this.mAdminInviteCode = getAdminInviteCode();
     }
+
     @PropertyName("name")
     public String getName() {
         return mName;
@@ -77,6 +83,31 @@ public class Group implements Serializable {
     @PropertyName("questions")
     public void setQuestions(ArrayList<Question> questions) {
         mQuestions = questions;
+    }
+
+    public int getInviteCode() {
+        if (mInviteCode == 0) {
+            Random random = new Random();
+            mInviteCode = 1000 + random.nextInt(8999);
+        }
+        return mInviteCode;
+    }
+
+    public void setInviteCode(int inviteCode) {
+        mInviteCode = inviteCode;
+    }
+
+    public int getAdminInviteCode() {
+        if (mAdminInviteCode == 0) {
+            Random random = new Random();
+            mAdminInviteCode = 1000 + random.nextInt(8999);
+        }
+
+        return mAdminInviteCode;
+    }
+
+    public void setAdminInviteCode(int adminInviteCode) {
+        mAdminInviteCode = adminInviteCode;
     }
 
     public void addQuestion(Question question) {

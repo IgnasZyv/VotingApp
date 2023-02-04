@@ -57,9 +57,8 @@ public class CreateGroupFragment extends Fragment {
                 userGroupsRef.child(group.getId()).setValue(groupMap);
 
             }).addOnFailureListener(failure -> {
-                Log.w("CreateGroupFragment", "Group creation failed");
+                Log.w("CreateGroupFragment", "Group creation failed" + failure.getMessage());
             });
-
 
             requireActivity().finish();
         });

@@ -17,4 +17,10 @@
     <string name="log_out">Log out</string>
     <string name="Invite">Invite</string>
     <string name="details">Details</string>
+    <string name="invite_to_group">Invite To Group</string>
+    <string name="invitation_code">Invitation Code</string>
+    <string name="admin_invitation_code">Admin Invitation Code</string>
+    <string name="join_group">Join Group</string>
+    <string name="admin">admin</string>
+    <string name="invite_code">Invite Code</string>
 </resources>

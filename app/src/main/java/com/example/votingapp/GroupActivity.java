@@ -69,6 +69,9 @@ public class GroupActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         return true;
+                    } else if (menuItem.getItemId() == R.id.join_group) {
+                        JoinGroupDialogFragment joinGroupDialogFragment = new JoinGroupDialogFragment();
+                        joinGroupDialogFragment.show(getSupportFragmentManager(), "joinGroupDialogFragment");
                     }
 
                     return false;
@@ -103,15 +106,16 @@ public class GroupActivity extends AppCompatActivity {
                 public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
 
                     if (menuItem.getItemId() == R.id.invite) {
-                        getSupportFragmentManager().beginTransaction()
-                                .setReorderingAllowed(true)
-                                .replace(R.id.fragment_container, InviteFragment.class, bundle)
-                                .commit();
+                        GroupCodeDialogFragment groupCodeDialogFragment = new GroupCodeDialogFragment(bundle);
+                        groupCodeDialogFragment.show(getSupportFragmentManager(), "groupCodeDialogFragment");
+                        return true;
                     }
 
                     return false;
                 }
             });
+
+
 
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)

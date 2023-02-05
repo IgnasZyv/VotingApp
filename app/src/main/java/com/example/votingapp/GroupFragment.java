@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -73,6 +74,11 @@ public class GroupFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_group, container, false);
 
+
+        TextView userEmail = v.findViewById(R.id.tv_user_email);
+        userEmail.setText(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail());
+
+
         mDAOGroup = new DAOGroup();
 
         mGroups = new ArrayList<>();
@@ -84,13 +90,6 @@ public class GroupFragment extends Fragment {
 
         ImageButton createGroupButton = v.findViewById(R.id.btn_add_group);
         ImageButton signOutButton = v.findViewById(R.id.ib_sign_out);
-
-        Button listButton = v.findViewById(R.id.btn_list_items);
-
-        listButton.setOnClickListener(view -> {
-            Intent intent = new Intent(getActivity(), QuestionListActivity.class);
-            startActivity(intent);
-        });
 
         createGroupButton.setOnClickListener(view -> {
             Intent intent = new Intent(getActivity(), GroupActivity.class);

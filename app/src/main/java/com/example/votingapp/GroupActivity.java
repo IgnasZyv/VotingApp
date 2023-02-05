@@ -115,6 +115,8 @@ public class GroupActivity extends AppCompatActivity {
                 }
             });
 
+
+
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .replace(R.id.fragment_container, GroupPageFragment.class, bundle)

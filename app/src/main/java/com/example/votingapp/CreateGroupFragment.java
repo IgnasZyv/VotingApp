@@ -22,7 +22,7 @@ import java.util.Objects;
 
 public class CreateGroupFragment extends Fragment {
 
-        public CreateGroupFragment() {
+    public CreateGroupFragment() {
             super(R.layout.fragment_create_group);
         }
 
@@ -40,21 +40,20 @@ public class CreateGroupFragment extends Fragment {
         EditText groupName = view.findViewById(R.id.et_title);
         Button createGroupButton = view.findViewById(R.id.btn_submit);
 
-
-
         DAOGroup daoGroup = new DAOGroup();
         createGroupButton.setOnClickListener(view1 -> {
             Group group = new Group(groupName.getText().toString());
             group.addAdministrator(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
             daoGroup.add(group).addOnSuccessListener(success -> {
-                Log.w("CreateGroupFragment", "Group created successfully");
+
 
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
                 DatabaseReference userGroupsRef = db.getReference("UserGroups").child(Objects.requireNonNull(auth.getUid()));
                 HashMap<String, Boolean> groupMap = new HashMap<>();
-                groupMap.put(group.getId(), true);
+                groupMap.put("administrator", true);
                 userGroupsRef.child(group.getId()).setValue(groupMap);
+                Log.w("CreateGroupFragment", "Group created successfully");
 
             }).addOnFailureListener(failure -> {
                 Log.w("CreateGroupFragment", "Group creation failed" + failure.getMessage());

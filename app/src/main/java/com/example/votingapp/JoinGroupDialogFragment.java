@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -63,11 +64,21 @@ public class JoinGroupDialogFragment extends DialogFragment {
                                     for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
                                         Group group = groupSnapshot.getValue(Group.class); // create a group object from the data in the database
                                         HashMap<String, Boolean> groupMap = new HashMap<>(); // create a hashmap to add to the user's groups
-                                        groupMap.put(group.getId(), true);
+                                        groupMap.put("administrator", false);
                                         // add the group to the user's groups
+                                        assert group != null;
+                                        ArrayList<String> members;
+                                        if (group.getMembers() == null) {
+                                            members = new ArrayList<>();
+                                        } else {
+                                            members = group.getMembers();
+                                        }
+                                        members.add(auth.getUid());
+//
+                                        rootRef.child("Group").child(group.getId()).child("members").setValue(members);
+
                                         rootRef.child("UserGroups").child(Objects.requireNonNull(auth.getUid())).child(group.getId()).setValue(groupMap);
-                                        Toast.makeText(getContext(), "Joined group " + group.getName(), Toast.LENGTH_SHORT).show();
-                                    }
+                                        }
 
                                 } else {
                                     Toast.makeText(getContext(), "Group not found", Toast.LENGTH_SHORT).show();

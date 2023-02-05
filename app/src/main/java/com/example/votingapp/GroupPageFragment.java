@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class GroupPageFragment extends Fragment {
     private DAOQuestion mDAOQuestion;
     private ValueEventListener mValueEventListener;
     private Group mGroup;
+    private Boolean mIsAdmin;
 
     public GroupPageFragment() {
         super(R.layout.fragment_group_page);
@@ -100,6 +102,16 @@ public class GroupPageFragment extends Fragment {
         });
 
         updateUi();
+
+        if (mGroup.getMembers() == null ||
+                !mGroup.getMembers().contains(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())) {
+            mIsAdmin = true;
+            mCreateQuestionButton.setEnabled(true);
+        } else {
+            mIsAdmin = false;
+            mCreateQuestionButton.setEnabled(false);
+        }
+
 
         return v;
     }

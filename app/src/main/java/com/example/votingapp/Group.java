@@ -1,11 +1,9 @@
 package com.example.votingapp;
 
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.PropertyName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -15,7 +13,7 @@ public class Group implements Serializable {
     private String mId;
     private ArrayList<String> mMembers;
     private ArrayList<String> mAdministrators;
-    private ArrayList<Question> mQuestions;
+    private ArrayList<Question> mQuestion;
     private int mInviteCode = 0;
     private int mAdminInviteCode = 0;
 
@@ -26,7 +24,7 @@ public class Group implements Serializable {
         this.mId = UUID.randomUUID().toString();
         this.mMembers = new ArrayList<>();
         this.mAdministrators = new ArrayList<>();
-        this.mQuestions = new ArrayList<>();
+        this.mQuestion = new ArrayList<>();
         this.mInviteCode = getInviteCode();
         this.mAdminInviteCode = getAdminInviteCode();
     }
@@ -75,14 +73,12 @@ public class Group implements Serializable {
         mAdministrators.add(administrator);
     }
 
-    @PropertyName("questions")
-    public ArrayList<Question> getQuestions() {
-        return mQuestions;
+    public ArrayList<Question> getQuestion() {
+        return mQuestion;
     }
 
-    @PropertyName("questions")
-    public void setQuestions(ArrayList<Question> questions) {
-        mQuestions = questions;
+    public void setQuestion(ArrayList<Question> question) {
+        mQuestion = question;
     }
 
     public int getInviteCode() {
@@ -111,14 +107,14 @@ public class Group implements Serializable {
     }
 
     public void addQuestion(Question question) {
-        if (mQuestions == null) {
-            mQuestions = new ArrayList<>();
+        if (mQuestion == null) {
+            mQuestion = new ArrayList<>();
         }
-        mQuestions.add(question);
+        mQuestion.add(question);
     }
 
     public Question getQuestion(String id) {
-        for (Question question : mQuestions) {
+        for (Question question : mQuestion) {
             if (question.getId().equals(id)) {
                 return question;
             }

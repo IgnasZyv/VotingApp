@@ -36,21 +36,19 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
             // If checked position is -1 don't select anything by default.
             if (checkedPosition == -1) {
                 mRadioButton.setChecked(false);
-            } else {
-                // If the current position is equal to the selected position then mark the view as selected.
-                mRadioButton.setChecked(checkedPosition == getAdapterPosition());
             }
-
             // Set the click listener for the radio button.
             mRadioButton.setOnClickListener(v -> {
                 // If the current position does not equal the recent selected position then reset the previous button.
-                if (checkedPosition != getAdapterPosition()) {
+                if (!answer.isChecked()) {
+                    for (Answer a : mAnswers) {
+                        a.setChecked(false);
+                    }
+                    answer.setChecked(true);
                     notifyItemChanged(checkedPosition);
                     checkedPosition = getAdapterPosition();
                 }
-
             });
-
         }
     }
 

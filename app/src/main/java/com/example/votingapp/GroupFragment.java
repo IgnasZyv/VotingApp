@@ -199,7 +199,7 @@ public class GroupFragment extends Fragment {
                         }
 
                         @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
                             Log.e("GroupFragment", "loadPost:onCancelled", databaseError.toException());
                         }
                     });

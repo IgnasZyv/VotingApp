@@ -9,15 +9,36 @@
         android:id="@+id/dialog_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enter Group Invitation Code"
+        android:text="@string/enter_group_invitation_code"
         android:textSize="20sp"
         android:layout_margin="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/admin"
+            android:layout_marginEnd="6dp"
+            android:textSize="16sp"/>
+
+        <CheckBox
+            android:id="@+id/cb_admin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/et_invitation_code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Invitation Code"
+        android:hint="@string/invitation_code"
         android:inputType="text"
         android:layout_margin="10dp"/>
 

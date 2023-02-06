@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -47,49 +49,9 @@ public class JoinGroupDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         // get the invitation code
                         int inviteCode = Integer.parseInt(mInvitationCode.getText().toString());
+                        CheckBox isAdmin = view.findViewById(R.id.cb_admin);
 
-                        // get the reference to the root of the database
-                        DatabaseReference rootRef = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/")
-                                .getReference();
-                        // get the reference to the group that has the invite code
-                        Query groupQuery = rootRef.child("Group").orderByChild("inviteCode").equalTo(inviteCode);
-
-                        // get the group
-                        groupQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                // if the group exists
-                                if (dataSnapshot.exists()) {
-                                    // get the group
-                                    for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
-                                        Group group = groupSnapshot.getValue(Group.class); // create a group object from the data in the database
-                                        HashMap<String, Boolean> groupMap = new HashMap<>(); // create a hashmap to add to the user's groups
-                                        groupMap.put("administrator", false);
-                                        // add the group to the user's groups
-                                        assert group != null;
-                                        ArrayList<String> members;
-                                        if (group.getMembers() == null) {
-                                            members = new ArrayList<>();
-                                        } else {
-                                            members = group.getMembers();
-                                        }
-                                        members.add(auth.getUid());
-//
-                                        rootRef.child("Group").child(group.getId()).child("members").setValue(members);
-
-                                        rootRef.child("UserGroups").child(Objects.requireNonNull(auth.getUid())).child(group.getId()).setValue(groupMap);
-                                        }
-
-                                } else {
-                                    Toast.makeText(getContext(), "Group not found", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Log.d("JoinGroupFragment", "onCancelled: " + databaseError.getMessage());
-                            }
-                        });
+                        joinGroup(inviteCode, isAdmin.isChecked());
 
                     }
                 })
@@ -100,5 +62,68 @@ public class JoinGroupDialogFragment extends DialogFragment {
                     }
                 });
         return builder.create();
+    }
+
+    public void joinGroup(int inviteCode, boolean isAdmin) {
+        // get the reference to the root of the database
+        DatabaseReference rootRef = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        Query groupQuery;
+        if (isAdmin) {
+            groupQuery = rootRef.child("Group").orderByChild("adminInviteCode").equalTo(inviteCode);
+        } else {
+            groupQuery = rootRef.child("Group").orderByChild("inviteCode").equalTo(inviteCode);
+
+        }
+        // get the group
+        groupQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // if the group exists
+                if (dataSnapshot.exists()) {
+                    // get the group
+                    for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
+                        Group group = groupSnapshot.getValue(Group.class); // create a group object from the data in the database
+                        HashMap<String, Boolean> groupMap = new HashMap<>(); // create a hashmap to add to the user's groups
+                        if (isAdmin) {
+                            groupMap.put("administrator", true);
+                            assert group != null;
+                            ArrayList<String> admins;
+                            if (group.getAdministrators() == null) {
+                                admins = new ArrayList<>();
+                            } else {
+                                admins = group.getAdministrators();
+                            }
+                            admins.add(auth.getUid());
+                            rootRef.child("Group").child(group.getId()).child("administrators").setValue(admins);
+                        } else {
+                            groupMap.put("administrator", false);
+                            // add the group to the user's groups
+                            assert group != null;
+                            ArrayList<String> members;
+                            if (group.getMembers() == null) {
+                                members = new ArrayList<>();
+                            } else {
+                                members = group.getMembers();
+                            }
+                            members.add(auth.getUid());
+                            rootRef.child("Group").child(group.getId()).child("members").setValue(members);
+                        }
+                    rootRef.child("UserGroups").child(Objects.requireNonNull(auth.getUid())).child(group.getId()).setValue(groupMap);
+                    }
+
+                } else {
+                    Toast.makeText(getContext(), "Group not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("JoinGroupFragment", "onCancelled: " + databaseError.getMessage());
+            }
+        });
+
     }
 }

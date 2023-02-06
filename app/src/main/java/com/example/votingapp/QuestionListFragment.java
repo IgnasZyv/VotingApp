@@ -113,8 +113,8 @@ public class QuestionListFragment extends Fragment {
             answers.add(new Answer("Answer 2"));
             answers.add(new Answer("Answer 3"));
 
-            AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, getContext());
-            mAnswerRecyclerView.setAdapter(answerListAdapter);
+//            AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, getContext());
+//            mAnswerRecyclerView.setAdapter(answerListAdapter);
 
             mDetailButton.setOnClickListener(v -> {
 //                Bundle bundle = new Bundle();

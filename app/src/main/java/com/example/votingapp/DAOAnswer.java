@@ -9,11 +9,15 @@ public class DAOAnswer {
 
     public DAOAnswer() {
         FirebaseDatabase db = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/");
-        mDatabase = db.getReference(Answer.class.getSimpleName());
+        mDatabase = db.getReference(Group.class.getSimpleName());
     }
 
     public Task<Void> add(Answer answer) {
         return mDatabase.push().setValue(answer);
+    }
+
+    public Task<Void> update(Answer answer, Question question, Group group) {
+        return mDatabase.child(group.getId()).child(question.getId()).child(answer.getId()).setValue(answer);
     }
 
 }

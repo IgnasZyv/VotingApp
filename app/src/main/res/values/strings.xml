@@ -23,4 +23,5 @@
     <string name="join_group">Join Group</string>
     <string name="admin">admin</string>
     <string name="invite_code">Invite Code</string>
+    <string name="enter_group_invitation_code">Enter Group Invitation Code</string>
 </resources>

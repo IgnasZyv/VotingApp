@@ -1,16 +1,21 @@
 package com.example.votingapp;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class Answer implements Serializable {
     private String mAnswerTitle;
-    private int mAnswerCount;
+    private int mVotes;
+    private String mId;
     private boolean isChecked;
 
     public Answer(){}
 
     public Answer(String answerTitle) {
-        mAnswerTitle = answerTitle;
+        this.mAnswerTitle = answerTitle;
+        this.isChecked = false;
+        this.mVotes = 0;
+        this.mId = UUID.randomUUID().toString();
     }
 
     public String getAnswerTitle() {
@@ -21,14 +26,6 @@ public class Answer implements Serializable {
         mAnswerTitle = answerTitle;
     }
 
-    public int getAnswerCount() {
-        return mAnswerCount;
-    }
-
-    public void setAnswerCount(int answerCount) {
-        mAnswerCount = answerCount;
-    }
-
     public boolean isChecked() {
         return isChecked;
     }
@@ -37,4 +34,23 @@ public class Answer implements Serializable {
         isChecked = checked;
     }
 
+    public int getVotes() {
+        return mVotes;
+    }
+
+    public void setVotes(int votes) {
+        mVotes = votes;
+    }
+
+    public void incrementVotes() {
+        mVotes++;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
+    }
 }

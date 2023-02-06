@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.Objects;
 
 public class GroupCodeDialogFragment extends androidx.fragment.app.DialogFragment {
@@ -35,21 +37,25 @@ public class GroupCodeDialogFragment extends androidx.fragment.app.DialogFragmen
 
         mInvitationCode.setText(String.valueOf(group.getInviteCode()));
         TextView mAdminCode = view.findViewById(R.id.tv_admin_invitation_code);
-
-        ConstraintLayout cl = view.findViewById(R.id.cl_admin_code);
-        Button btn = view.findViewById(R.id.btn_show_admin_code);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (cl.getVisibility() == View.VISIBLE) {
-                    cl.setVisibility(View.GONE);
-                    mAdminCode.clearComposingText();
-                } else {
-                    mAdminCode.setText(String.valueOf(group.getAdminInviteCode()));
-                    cl.setVisibility(View.VISIBLE);
+        Button btn = view.findViewById(R.id.btn_show_admin_code);;
+        if (group.getAdministrators().contains(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())) {
+            ConstraintLayout cl = view.findViewById(R.id.cl_admin_code);
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (cl.getVisibility() == View.VISIBLE) {
+                        cl.setVisibility(View.GONE);
+                        mAdminCode.clearComposingText();
+                    } else {
+                        mAdminCode.setText(String.valueOf(group.getAdminInviteCode()));
+                        cl.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            btn.setVisibility(View.GONE);
+        }
+
         builder.setView(view)
                 .setPositiveButton("close", new DialogInterface.OnClickListener() {
                     @Override

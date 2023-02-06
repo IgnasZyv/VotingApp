@@ -6,8 +6,6 @@ import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,15 +26,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public class GroupPageFragment extends Fragment {
 
@@ -80,29 +77,34 @@ public class GroupPageFragment extends Fragment {
         mCreateQuestionButton = v.findViewById(R.id.btn_create_question);
 
         mCreateQuestionButton.setOnClickListener(v3 -> {
-            createQuestion();
-            updateUi();
-            createQuestionLayout();
+            if (!(mAddAnswerLayout.getChildCount() >= 2)) {
+                Toast.makeText(getActivity(), "More than one answer required", Toast.LENGTH_SHORT).show();
+            } else {
+                if (createQuestion()) { // if question is created
+                    mQuestionTitle.setText("");
+                    mAddAnswerLayout.removeAllViews();
+                    updateUi();
+                    createQuestionLayout();
+                }
+            }
         });
 
+        // create question layout
         createQuestionButton.setOnClickListener(v1 -> {
             createQuestionLayout();
+            // if answer layout is empty add a row
+            if (mAddAnswerLayout.getChildCount() == 0) {
+                addAnswerRow();
+            }
         });
 
         addAnwswerButton.setOnClickListener(v2 -> {
-            final EditText editText = new EditText(getActivity());
-            editText.setId(View.generateViewId());
-            editText.setHint("Choice");
-            editText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            editText.setPadding(20, 20, 20, 20);
-
-            if (mAddAnswerLayout != null) {
-                mAddAnswerLayout.addView(editText);
-            }
+            addAnswerRow();
         });
 
         updateUi();
 
+        // if user is admin, the button to create a question is visible
         if (mGroup.getMembers() == null ||
                 !mGroup.getMembers().contains(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())) {
             mIsAdmin = true;
@@ -112,8 +114,46 @@ public class GroupPageFragment extends Fragment {
             mCreateQuestionButton.setEnabled(false);
         }
 
-
         return v;
+    }
+
+    private void addAnswerRow() {
+        // Create a new row to add an answer
+        LinearLayout horizontalAnswerLayout = new LinearLayout(getActivity());
+        horizontalAnswerLayout.setOrientation(LinearLayout.HORIZONTAL);
+        horizontalAnswerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        horizontalAnswerLayout.setPadding(20, 20, 20, 20);
+        horizontalAnswerLayout.setGravity(View.TEXT_ALIGNMENT_CENTER);
+
+        float factor = getResources().getDisplayMetrics().density; // get the density factor
+
+        // Create a new EditText
+        final EditText editText = new EditText(getActivity());
+        editText.setId(View.generateViewId());
+        editText.setHint("Choice");
+        int pxWidthText = (int) (280 * factor); // set the width of the EditText
+        editText.setLayoutParams(new LinearLayout.LayoutParams(pxWidthText, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        int pxWidthButton = (int)(48 * factor);
+        int pxHeightButton = (int)(48 * factor);
+
+        // Create a new remove button
+        ImageButton btnDelete = new ImageButton(getContext());
+        btnDelete.setId(View.generateViewId());
+        btnDelete.setLayoutParams(new LinearLayout.LayoutParams(pxWidthButton, pxHeightButton));
+        btnDelete.setImageResource(R.drawable.ic_remove);
+        btnDelete.setOnClickListener(new View.OnClickListener() { // remove the row
+            @Override
+            public void onClick(View v) {
+                mAddAnswerLayout.removeView(horizontalAnswerLayout);
+            }
+        });
+
+        if (mAddAnswerLayout != null) { // add the row to the layout
+            horizontalAnswerLayout.addView(editText);
+            horizontalAnswerLayout.addView(btnDelete);
+            mAddAnswerLayout.addView(horizontalAnswerLayout);
+        }
     }
 
     private void updateUi() {
@@ -140,7 +180,7 @@ public class GroupPageFragment extends Fragment {
                         mAdapter.setQuestions(questions);
                         mAdapter.notifyDataSetChanged();
                     }
-                    mGroup.setQuestions(questions);
+                    mGroup.setQuestion(questions);
                 }
 
                 @Override
@@ -173,7 +213,7 @@ public class GroupPageFragment extends Fragment {
         }
     }
 
-    private void createQuestion() {
+    private Boolean createQuestion() {
 
         ArrayList<Answer> choices = new ArrayList<>();
 
@@ -182,13 +222,26 @@ public class GroupPageFragment extends Fragment {
         Group group = (Group) bundle.getSerializable("group");
 
         String questionTitle = mQuestionTitle.getText().toString();
-
+        if (questionTitle.isEmpty()) {
+            Toast.makeText(getActivity(), "Question title is required", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         for (int i = 0; i < mAddAnswerLayout.getChildCount(); i++) {
             View view = mAddAnswerLayout.getChildAt(i);
-            if (view instanceof EditText) {
-                EditText editText = (EditText) view;
-                Answer answer = new Answer(editText.getText().toString());
-                choices.add(answer);
+            if (view instanceof LinearLayout) {
+                LinearLayout answerLayout = (LinearLayout) view;
+                View child = answerLayout.getChildAt(0);
+                if (child instanceof EditText) {
+                    EditText editText = (EditText) child;
+                    String answerText = editText.getText().toString();
+                    if (!answerText.isEmpty()) {
+                        Answer answer = new Answer(editText.getText().toString());
+                        choices.add(answer);
+                    } else {
+                        Toast.makeText(getActivity(), "Empty answer", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                }
             }
         }
 
@@ -204,6 +257,8 @@ public class GroupPageFragment extends Fragment {
         mQuestionTitle.refreshDrawableState();
         mAddAnswerLayout.refreshDrawableState();
 
+        return true;
+
     }
 
 
@@ -216,6 +271,7 @@ public class GroupPageFragment extends Fragment {
 
         private final ImageView mExpandLayoutImage;
         private final ConstraintLayout mExpandLayout;
+        private final Button mSubmitButton;
 
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -225,7 +281,7 @@ public class GroupPageFragment extends Fragment {
             mQuestionDateTextView = itemView.findViewById(R.id.tv_item_date);
             mAnswerRecyclerView = itemView.findViewById(R.id.rv_item_answers);
             mDetailButton = itemView.findViewById(R.id.btn_detail);
-
+            mSubmitButton = itemView.findViewById(R.id.btn_submit);
             mExpandLayout = itemView.findViewById(R.id.constraint_layout);
             mExpandLayoutImage = itemView.findViewById(R.id.iv_arrow);
 
@@ -252,6 +308,56 @@ public class GroupPageFragment extends Fragment {
 
             AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, getContext());
             mAnswerRecyclerView.setAdapter(answerListAdapter);
+
+            // get the reference to the root of the database
+            DatabaseReference rootRef = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/")
+                    .getReference();
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+
+            mSubmitButton.setOnClickListener(v -> {
+                Query answerQuery = rootRef.child("Group")
+                        .child(mGroup.getId())
+                        .child("Question")
+                        .child(question.getId())
+                        .child("answers");
+
+                for (Answer answer : answers) {
+                    if (answer.isChecked()) {
+
+                        answerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot ds : snapshot.getChildren()) {
+                                    String position = ds.getKey();
+                                    Answer pickedAnswer = ds.getValue(Answer.class);
+
+                                    if (pickedAnswer != null && pickedAnswer.getId().equals(answer.getId())) {
+//                                        pickedAnswer.addVoter(auth.getCurrentUser().getUid());
+                                        pickedAnswer.incrementVotes();
+                                        assert position != null;
+                                        Log.d("Answer", "onDataChange: " + pickedAnswer.getVotes());
+                                        ds.getRef().child("votes").setValue(pickedAnswer.getVotes());
+                                        Toast.makeText(getActivity(), "Vote submitted", Toast.LENGTH_SHORT).show();
+
+                                    }
+//
+//                                    if (position != null) {
+//                                        if (position.equals(answer.getId())) {
+//                                            ds.getRef().child("votes").setValue(answer.getVotes() + 1);
+//                                        }
+//                                    }
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.d("GroupPageFrag", "onCancelled: " + error.getMessage());
+                            }
+                        });
+
+                    }
+                }
+            });
 
             mDetailButton.setOnClickListener(v -> {
                 Bundle bundle = getArguments();

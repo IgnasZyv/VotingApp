@@ -1,8 +1,13 @@
 package com.example.votingapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.transition.AutoTransition;
+import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,19 +16,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,6 +39,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,6 +57,7 @@ public class GroupPageFragment extends Fragment {
     private ValueEventListener mValueEventListener;
     private Group mGroup;
     private Boolean mIsAdmin;
+    private Question mQuestion;
 
     public GroupPageFragment() {
         super(R.layout.fragment_group_page);
@@ -165,35 +175,76 @@ public class GroupPageFragment extends Fragment {
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            mValueEventListener = new ValueEventListener() {
+
+            ChildEventListener childEventListener = new ChildEventListener() {
+                ArrayList<Question> previousQuestions;
+                int questionCount = 0;
+
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) { // When data changes
-                    ArrayList<Question> questions = new ArrayList<>();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) { // for each question
-                        Question question = dataSnapshot.getValue(Question.class);
-                        questions.add(question);
-                    }
-                    if (mAdapter == null) {
-                        mAdapter = new QuestionAdapter(questions);
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    Question question = snapshot.getValue(Question.class);
+                    if (previousQuestions == null || previousQuestions.size() == 0) {
+                        previousQuestions = new ArrayList<>();
+                        mAdapter = new QuestionAdapter(sortQuestions(previousQuestions));
                         mQuestionRecyclerView.setAdapter(mAdapter);
-                    } else {
-                        mAdapter.setQuestions(questions);
-                        mAdapter.notifyDataSetChanged();
                     }
-                    mGroup.setQuestion(questions);
+
+                    if (!previousQuestions.contains(question)) {
+                        previousQuestions.add(question);
+                        questionCount++;
+                    }
+                    Log.d("updateUI", "onChildAdded: " + questionCount);
+                    Log.d("updateUI", "onChildAdded:  children count" + snapshot.getChildrenCount());
+
+                    sortQuestions(previousQuestions);
+
+                    mQuestionRecyclerView.setItemAnimator(new DefaultItemAnimator());
+                    mAdapter.notifyItemInserted(previousQuestions.indexOf(question));
+//                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    Question question = snapshot.getValue(Question.class);
+                    int index = previousQuestions.indexOf(question);
+                    if (index != -1) {
+                        previousQuestions.set(index, question);
+                        mAdapter.notifyItemChanged(index);
+                    }
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                    Question question = snapshot.getValue(Question.class);
+                    int index = previousQuestions.indexOf(question);
+                    if (index != -1) {
+                        previousQuestions.remove(index);
+                        mAdapter.notifyItemRemoved(index);
+                    }
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     Log.d("GroupPageFrag", "onCancelled: " + error.getMessage());
                 }
+
             };
 
-            mDAOQuestion.get(mGroup.getId()).addValueEventListener(mValueEventListener);
-
+            mDAOQuestion.get(mGroup.getId()).addChildEventListener(childEventListener);
+            }
         }
 
-    }
+        private ArrayList<Question> sortQuestions(ArrayList<Question> questions) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Collections.sort(questions, Comparator.comparing(Question::getDate));
+            }
+            return questions;
+        }
 
     @Override
     public void onPause() {
@@ -245,33 +296,37 @@ public class GroupPageFragment extends Fragment {
             }
         }
 
-        Question question = new Question(questionTitle, choices);
+        Question mQuestion = new Question(questionTitle, choices);
 
-        mDAOQuestion.add(question, group.getId()).addOnSuccessListener(success -> {
+        mDAOQuestion.add(mQuestion, group.getId()).addOnSuccessListener(success -> {
             Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
-            group.addQuestion(question);
+            group.addQuestion(mQuestion);
+//            updateUi();
         }).addOnFailureListener(failure -> {
             Toast.makeText(getActivity(), "Question not created", Toast.LENGTH_SHORT).show();
         });
 
-        mQuestionTitle.refreshDrawableState();
-        mAddAnswerLayout.refreshDrawableState();
 
         return true;
 
     }
 
 
-    private class QuestionHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class QuestionHolder extends RecyclerView.ViewHolder {
 
         private final TextView mQuestionTitleTextView;
         private final TextView mQuestionDateTextView;
         private final RecyclerView mAnswerRecyclerView;
         private final Button mDetailButton;
 
-        private final ImageView mExpandLayoutImage;
         private final ConstraintLayout mExpandLayout;
         private final Button mSubmitButton;
+
+        private TextView mAnswerTitleTextView;
+        private ConstraintLayout mVotedLayout;
+        private Answer mPickedAnswer;
+        private TextView mAnswerCount;
+
 
 
         public QuestionHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -283,17 +338,14 @@ public class GroupPageFragment extends Fragment {
             mDetailButton = itemView.findViewById(R.id.btn_detail);
             mSubmitButton = itemView.findViewById(R.id.btn_submit);
             mExpandLayout = itemView.findViewById(R.id.constraint_layout);
-            mExpandLayoutImage = itemView.findViewById(R.id.iv_arrow);
-
-        }
-
-
-        @Override
-        public void onClick(View v) {
-            expandableLayout();
+            mAnswerTitleTextView = itemView.findViewById(R.id.tv_answer_title);
+            mVotedLayout = itemView.findViewById(R.id.cl_voted_layout);
+            mAnswerCount = itemView.findViewById(R.id.tv_vote_count);
         }
 
         public void bind(Question question) {
+
+            CardView cardView;
             mQuestionTitleTextView.setText(question.getTitle());
             mQuestionDateTextView.setText(question.getDate().toString());
 
@@ -305,58 +357,93 @@ public class GroupPageFragment extends Fragment {
             mAnswerRecyclerView.setHasFixedSize(true);
 
             ArrayList<Answer> answers = new ArrayList<>(question.getAnswers());
-
             AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, getContext());
             mAnswerRecyclerView.setAdapter(answerListAdapter);
+
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+
+            int count = 0;
+            Answer votedAnswer = null;
+            for (Answer answer : question.getAnswers()) {
+                if (!answer.getVoters().isEmpty()) {
+                    // If the user's id is in the list of voters, remember the answer
+                    Log.d("bind disable answer", "bind: " + answer.getVoters().toString() + " " + auth.getUid());
+                    if (answer.getVoters().contains(auth.getUid())) {
+                        votedAnswer = answer;
+                    }
+                }
+                count += answer.getVotes();
+            }
+            String concatCount = count + " votes";
+            mAnswerCount.setText(concatCount);
+            if (votedAnswer != null) {
+//                disableQuestion(question, votedAnswer);
+                mSubmitButton.setEnabled(false);
+                cardView = QuestionHolder.this.itemView.findViewById(R.id.cardView);
+
+                int borderWidth = 6; // specify the border width in pixels
+                int borderColor = Color.rgb(51, 241, 235); // specify the border color, e.g. Color.BLACK
+
+                cardView.setCardElevation(borderWidth);
+
+                GradientDrawable gd = new GradientDrawable();
+                gd.setStroke(borderWidth, borderColor); // set the border width and color
+                gd.setCornerRadius(30);
+                cardView.setBackground(gd);
+
+                mSubmitButton.setTextColor(Color.parseColor("#F50A71"));
+                mSubmitButton.setText(R.string.voted);
+                mAnswerRecyclerView.setVisibility(View.GONE);
+                mVotedLayout.setVisibility(View.VISIBLE);
+                mAnswerTitleTextView.setText(votedAnswer.getAnswerTitle());
+                question.setDisabled(true);
+            }
 
             // get the reference to the root of the database
             DatabaseReference rootRef = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/")
                     .getReference();
-            FirebaseAuth auth = FirebaseAuth.getInstance();
+
+            Query answerQuery = rootRef.child("Group")
+                    .child(mGroup.getId())
+                    .child("Question")
+                    .child(question.getId())
+                    .child("answers");
 
             mSubmitButton.setOnClickListener(v -> {
-                Query answerQuery = rootRef.child("Group")
-                        .child(mGroup.getId())
-                        .child("Question")
-                        .child(question.getId())
-                        .child("answers");
-
                 for (Answer answer : answers) {
                     if (answer.isChecked()) {
-
                         answerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 for (DataSnapshot ds : snapshot.getChildren()) {
                                     String position = ds.getKey();
-                                    Answer pickedAnswer = ds.getValue(Answer.class);
+                                    mPickedAnswer = ds.getValue(Answer.class);
 
-                                    if (pickedAnswer != null && pickedAnswer.getId().equals(answer.getId())) {
-//                                        pickedAnswer.addVoter(auth.getCurrentUser().getUid());
-                                        pickedAnswer.incrementVotes();
+                                    if (mPickedAnswer != null && mPickedAnswer.getId().equals(answer.getId())) {
+                                        mPickedAnswer.addVoter(auth.getUid());
+                                        mPickedAnswer.incrementVotes();
                                         assert position != null;
-                                        Log.d("Answer", "onDataChange: " + pickedAnswer.getVotes());
-                                        ds.getRef().child("votes").setValue(pickedAnswer.getVotes());
+
+                                        List<Answer> answersNew = question.getAnswers();
+                                        answersNew.set(Integer.parseInt(position), mPickedAnswer);
+                                        question.setAnswers(answersNew);
+
+                                        ds.getRef().child("votes").setValue(mPickedAnswer.getVotes());
+                                        ds.getRef().child("voters").setValue(mPickedAnswer.getVoters());
+
+                                        mAdapter.notifyItemChanged(getAdapterPosition());
                                         Toast.makeText(getActivity(), "Vote submitted", Toast.LENGTH_SHORT).show();
-
+                                        answerQuery.removeEventListener(this);
                                     }
-//
-//                                    if (position != null) {
-//                                        if (position.equals(answer.getId())) {
-//                                            ds.getRef().child("votes").setValue(answer.getVotes() + 1);
-//                                        }
-//                                    }
-
                                 }
                             }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
                                 Log.d("GroupPageFrag", "onCancelled: " + error.getMessage());
                             }
                         });
-
                     }
                 }
+
             });
 
             mDetailButton.setOnClickListener(v -> {
@@ -372,29 +459,30 @@ public class GroupPageFragment extends Fragment {
 
             mExpandLayout.setVisibility(View.GONE);
 
-            expandableLayout();
+            @SuppressLint("CutPasteId") CardView cardViewAnimation = QuestionHolder.this.itemView.findViewById(R.id.cardView);
+            cardViewAnimation.setOnClickListener(view -> {
+                expandableLayout();
+            });
 
         }
 
-
         private void expandableLayout() {
-            mExpandLayoutImage.setOnClickListener(v -> {
-                if (mExpandLayout.getVisibility() == View.GONE) {
-                    TransitionManager.beginDelayedTransition(mExpandLayout, new AutoTransition());
-                    mExpandLayout.setVisibility(View.VISIBLE);
-                    mExpandLayoutImage.setImageResource(R.drawable.ic_baseline_expand_less_24);
-                } else {
-                    TransitionManager.beginDelayedTransition(mExpandLayout, new AutoTransition());
-                    mExpandLayout.setVisibility(View.GONE);
-                    mExpandLayoutImage.setImageResource(R.drawable.ic_baseline_expand_more_24);
-                }
-            });
+            Transition transition = new AutoTransition();
+            transition.setDuration(400);
+            if (mExpandLayout.getVisibility() == View.GONE) {
+                TransitionManager.beginDelayedTransition(mExpandLayout, transition);
+                mExpandLayout.setVisibility(View.VISIBLE);
+            } else {
+                TransitionManager.beginDelayedTransition(mExpandLayout, transition);
+                mExpandLayout.setVisibility(View.GONE);
+            }
         }
     }
 
     private class QuestionAdapter extends RecyclerView.Adapter<QuestionHolder> {
 
         private final List<Question> mQuestions;
+        private int mPosition;
 
         public QuestionAdapter(List<Question> questions) {
             mQuestions = questions;
@@ -410,7 +498,12 @@ public class GroupPageFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull QuestionHolder holder, int position) {
             Question question = mQuestions.get(position);
+            mPosition = holder.getAdapterPosition();
             holder.bind(question);
+        }
+
+        public int getPosition() {
+            return mPosition;
         }
 
         @Override
@@ -426,6 +519,8 @@ public class GroupPageFragment extends Fragment {
             mQuestions.clear();
             mQuestions.addAll(questions);
         }
+
+
     }
 }
 

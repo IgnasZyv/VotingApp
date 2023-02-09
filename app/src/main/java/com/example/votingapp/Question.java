@@ -10,9 +10,8 @@ public class Question {
     private boolean isSelected;
     private Date date;
     private List<Answer> mAnswers;
-
-
     private String mId;
+    private Boolean mIsDisabled;
 
     public Question(){}
 
@@ -61,4 +60,22 @@ public class Question {
         mAnswers = answers;
     }
 
+    public Answer getAnswer(int index) {
+        return mAnswers.get(index);
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public Boolean getDisabled() {
+        if (mIsDisabled == null) {
+            mIsDisabled = false;
+        }
+        return mIsDisabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        mIsDisabled = disabled;
+    }
 }

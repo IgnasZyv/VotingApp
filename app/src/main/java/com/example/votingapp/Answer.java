@@ -1,6 +1,7 @@
 package com.example.votingapp;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Answer implements Serializable {
@@ -8,6 +9,7 @@ public class Answer implements Serializable {
     private int mVotes;
     private String mId;
     private boolean isChecked;
+    private ArrayList<String> mVoters;
 
     public Answer(){}
 
@@ -16,6 +18,7 @@ public class Answer implements Serializable {
         this.isChecked = false;
         this.mVotes = 0;
         this.mId = UUID.randomUUID().toString();
+        this.mVoters = new ArrayList<>();
     }
 
     public String getAnswerTitle() {
@@ -46,6 +49,24 @@ public class Answer implements Serializable {
         mVotes++;
     }
 
+    public ArrayList<String> getVoters() {
+        if (mVoters == null) {
+            mVoters = new ArrayList<>();
+        }
+        return mVoters;
+    }
+
+    public void setVoters(ArrayList<String> voters) {
+        mVoters = voters;
+    }
+
+    public void addVoter(String voter) {
+        if (mVoters == null) {
+            mVoters = new ArrayList<>();
+        }
+        mVoters.add(voter);
+    }
+
     public String getId() {
         return mId;
     }
@@ -53,4 +74,6 @@ public class Answer implements Serializable {
     public void setId(String id) {
         mId = id;
     }
+
+
 }

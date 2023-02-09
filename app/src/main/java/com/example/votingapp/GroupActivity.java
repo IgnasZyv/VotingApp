@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -70,7 +69,7 @@ public class GroupActivity extends AppCompatActivity {
                         startActivity(intent);
                         return true;
                     } else if (menuItem.getItemId() == R.id.join_group) {
-                        JoinGroupDialogFragment joinGroupDialogFragment = new JoinGroupDialogFragment();
+                        JoinGroupDialogFragment joinGroupDialogFragment = new JoinGroupDialogFragment(getApplicationContext());
                         joinGroupDialogFragment.show(getSupportFragmentManager(), "joinGroupDialogFragment");
                     }
 

@@ -24,4 +24,6 @@
     <string name="admin">admin</string>
     <string name="invite_code">Invite Code</string>
     <string name="enter_group_invitation_code">Enter Group Invitation Code</string>
+    <string name="you_have_voted">You have voted!</string>
+    <string name="voted">Voted</string>
 </resources>

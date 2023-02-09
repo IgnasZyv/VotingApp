@@ -37,7 +37,6 @@
 
         <activity android:name=".GroupActivity"/>
 
-        <activity android:name=".QuestionListActivity"/>
 
         <activity
             android:name=".QuestionActivity">

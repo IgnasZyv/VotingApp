@@ -2,12 +2,12 @@ package com.example.votingapp;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -29,8 +29,10 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class JoinGroupDialogFragment extends DialogFragment {
-    public JoinGroupDialogFragment() {
+    private final Context mContext;
+    public JoinGroupDialogFragment(Context context) {
         super(R.layout.dialog_fragment_join);
+        this.mContext = context;
     }
 
     @NonNull
@@ -47,12 +49,16 @@ public class JoinGroupDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.join_group, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // get the invitation code
-                        int inviteCode = Integer.parseInt(mInvitationCode.getText().toString());
-                        CheckBox isAdmin = view.findViewById(R.id.cb_admin);
+                        String invitationCode = mInvitationCode.getText().toString();
+                        try {
+                            // Check if the invitation code is valid
+                            int inviteCode = Integer.parseInt(invitationCode);
+                            CheckBox isAdmin = view.findViewById(R.id.cb_admin); // Check if the user is an admin
+                            joinGroup(inviteCode, isAdmin.isChecked()); // Join the group
 
-                        joinGroup(inviteCode, isAdmin.isChecked());
-
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(mContext, "Invalid invitation code", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -115,7 +121,7 @@ public class JoinGroupDialogFragment extends DialogFragment {
                     }
 
                 } else {
-                    Toast.makeText(getContext(), "Group not found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Group not found", Toast.LENGTH_SHORT).show();
                 }
             }
 

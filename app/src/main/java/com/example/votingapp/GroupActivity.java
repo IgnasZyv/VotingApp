@@ -21,7 +21,6 @@ public class GroupActivity extends AppCompatActivity {
     private Group mGroup;
     private MenuProvider mMenuProvider;
 
-
     public GroupActivity() {
         super(R.layout.activity_fragment);
     }
@@ -38,8 +37,6 @@ public class GroupActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
-
-
 
         Intent intent = getIntent();
         Bundle bundle = new Bundle();
@@ -81,7 +78,6 @@ public class GroupActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container, GroupFragment.class, bundle)
-
                     .commit();
         }
 

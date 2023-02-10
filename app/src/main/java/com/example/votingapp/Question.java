@@ -1,11 +1,12 @@
 package com.example.votingapp;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class Question {
+public class Question implements Serializable {
     private String mTitle;
     private boolean isSelected;
     private Date date;
@@ -13,14 +14,17 @@ public class Question {
     private String mId;
     private Boolean mIsDisabled;
 
+    private String mGroupId;
+
     public Question(){}
 
-    public Question(String title, List<Answer> answers) {
+    public Question(String title, List<Answer> answers, String groupId) {
         this.mTitle = title;
         this.mAnswers = answers;
         this.mId = UUID.randomUUID().toString();
         this.date = new Date();
         this.isSelected = false;
+        this.mGroupId = groupId;
     }
 
 
@@ -30,6 +34,14 @@ public class Question {
 
     public void setId(String id) {
         mId = id;
+    }
+
+    public String getGroupId() {
+        return mGroupId;
+    }
+
+    public void setGroupId(String groupId) {
+        mGroupId = groupId;
     }
 
     public String getTitle() {
@@ -64,18 +76,15 @@ public class Question {
         return mAnswers.get(index);
     }
 
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public Boolean getDisabled() {
-        if (mIsDisabled == null) {
-            mIsDisabled = false;
-        }
-        return mIsDisabled;
-    }
-
     public void setDisabled(Boolean disabled) {
         mIsDisabled = disabled;
+    }
+
+    public int getVoteCount() {
+        int count = 0;
+        for (Answer answer : mAnswers) {
+            count += answer.getVotes();
+        }
+        return count;
     }
 }

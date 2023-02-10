@@ -22,9 +22,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +41,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -200,7 +204,6 @@ public class GroupPageFragment extends Fragment {
 
                     mQuestionRecyclerView.setItemAnimator(new DefaultItemAnimator());
                     mAdapter.notifyItemInserted(previousQuestions.indexOf(question));
-//                    }
                 }
 
                 @Override
@@ -296,7 +299,7 @@ public class GroupPageFragment extends Fragment {
             }
         }
 
-        Question mQuestion = new Question(questionTitle, choices);
+        Question mQuestion = new Question(questionTitle, choices, group.getId());
 
         mDAOQuestion.add(mQuestion, group.getId()).addOnSuccessListener(success -> {
             Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
@@ -349,6 +352,10 @@ public class GroupPageFragment extends Fragment {
             mQuestionTitleTextView.setText(question.getTitle());
             mQuestionDateTextView.setText(question.getDate().toString());
 
+            if (question.getGroupId() == null) {
+                question.setGroupId(mGroup.getId());
+            }
+
 //            boolean isExpanded = question.isExpanded();
 //            mExpandableLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
 
@@ -357,7 +364,8 @@ public class GroupPageFragment extends Fragment {
             mAnswerRecyclerView.setHasFixedSize(true);
 
             ArrayList<Answer> answers = new ArrayList<>(question.getAnswers());
-            AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, getContext());
+            AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, question, getContext());
+            answerListAdapter.setIsInDetailsView(false);
             mAnswerRecyclerView.setAdapter(answerListAdapter);
 
             FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -449,12 +457,17 @@ public class GroupPageFragment extends Fragment {
             mDetailButton.setOnClickListener(v -> {
                 Bundle bundle = getArguments();
                 assert bundle != null;
-                bundle.putString("question", question.getId());
+                bundle.putSerializable("question", question);
                 bundle.putInt("position", getAdapterPosition());
                 bundle.putSerializable("answers", answers);
-                Intent intent = new Intent(getActivity(), QuestionActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
+
+                Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle(question.getTitle());
+
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .addToBackStack(null)
+                        .replace(R.id.fragment_container, QuestionDetailFragment.class, bundle)
+                        .commit();
             });
 
             mExpandLayout.setVisibility(View.GONE);
@@ -477,6 +490,12 @@ public class GroupPageFragment extends Fragment {
                 mExpandLayout.setVisibility(View.GONE);
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle(mGroup.getName());
     }
 
     private class QuestionAdapter extends RecyclerView.Adapter<QuestionHolder> {

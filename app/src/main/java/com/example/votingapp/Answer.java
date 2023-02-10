@@ -1,5 +1,7 @@
 package com.example.votingapp;
 
+import android.widget.ProgressBar;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -10,6 +12,7 @@ public class Answer implements Serializable {
     private String mId;
     private boolean isChecked;
     private ArrayList<String> mVoters;
+    private ProgressBar mProgressBar;
 
     public Answer(){}
 
@@ -75,5 +78,11 @@ public class Answer implements Serializable {
         mId = id;
     }
 
+    public ProgressBar getProgressBar() {
+        return mProgressBar;
+    }
 
+    public void setProgressBar(ProgressBar progressBar) {
+        mProgressBar = progressBar;
+    }
 }

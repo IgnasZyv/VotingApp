@@ -244,7 +244,7 @@ public class GroupPageFragment extends Fragment {
 
         private ArrayList<Question> sortQuestions(ArrayList<Question> questions) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Collections.sort(questions, Comparator.comparing(Question::getDate));
+                Collections.sort(questions, Comparator.comparing(Question::getFormattedDateString));
             }
             return questions;
         }
@@ -350,7 +350,7 @@ public class GroupPageFragment extends Fragment {
 
             CardView cardView;
             mQuestionTitleTextView.setText(question.getTitle());
-            mQuestionDateTextView.setText(question.getDate().toString());
+            mQuestionDateTextView.setText(question.getFormattedDateString());
 
             if (question.getGroupId() == null) {
                 question.setGroupId(mGroup.getId());

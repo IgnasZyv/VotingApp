@@ -37,10 +37,6 @@
 
         <activity android:name=".GroupActivity"/>
 
-        <activity
-            android:name=".QuestionActivity">
-        </activity>
-
         <activity android:name=".LogInActivity"
             android:exported="true">
             <intent-filter>

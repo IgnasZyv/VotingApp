@@ -1,18 +1,29 @@
 package com.example.votingapp;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,12 +46,16 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
         public TextView mAnswerTextView;
         public RadioButton mRadioButton;
         public ProgressBar mProgressBar;
+        public CardView mAnswerCard;
+        public TextView mVoteCount;
 
         public AnswerHolder(View itemView) {
             super(itemView);
             mAnswerTextView = itemView.findViewById(R.id.tv_answer_title);
             mRadioButton = itemView.findViewById(R.id.rb_answer);
             mProgressBar = itemView.findViewById(R.id.answer_progress);
+            mAnswerCard = itemView.findViewById(R.id.answer_card);
+            mVoteCount = itemView.findViewById(R.id.tv_vote_count);
         }
 
         public void bind(Answer answer) {
@@ -67,11 +82,18 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
                 }
             });
 
+            // If the user is in the details view, then hide the radio button and show the progress bar.
             if (mIsInDetailsView) {
                 mRadioButton.setVisibility(View.GONE);
                 mProgressBar.setVisibility(View.VISIBLE);
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mAnswerCard.getLayoutParams();
+                params.setMargins(20, 20, 20, 20);
+                mAnswerCard.setLayoutParams(params);
+                mVoteCount.setVisibility(View.VISIBLE);
 
+                // Set the progress bar
                 enableProgressBar(answer);
+
             }
 
 
@@ -86,6 +108,7 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
             DatabaseReference rootRef = FirebaseDatabase.getInstance("https://votingapp-6e7b7-default-rtdb.europe-west1.firebasedatabase.app/")
                     .getReference();
 
+            // Query to set a listener on the answers
             Query voteQuery = rootRef.child("Group")
                     .child(mQuestion.getGroupId())
                     .child("Question")
@@ -97,28 +120,45 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     List<Answer> newAnswers = new ArrayList<>();
                     int totalVotes = 0;
-
+                    int count = 0;
+                    // Get all answers and update the progress bar
                     for (DataSnapshot answerSnapshot : snapshot.getChildren()) {
                         Log.d("AnswerListAdapter", "onDataChange: answers" + answerSnapshot.getValue());
+                        // Get the answer
                         Answer answer = answerSnapshot.getValue(Answer.class);
                         assert answer != null;
+                        int[] colours = ColorTemplate.MATERIAL_COLORS;
+                        // if the answer is the same as the one we are binding, set the progress bar
                         if (answer.getId().equals(answerBind.getId())) {
                             answer.setProgressBar(answerBind.getProgressBar());
+                            // Set the colour of the progress bar
+                            answer.getProgressBar().setProgressTintList(ColorStateList.valueOf(colours[count]));
                         }
+                        count++;
+                        // Add the answer to the list and update the total votes
                         totalVotes += answer.getVotes();
                         newAnswers.add(answer);
                     }
 
+                    // Update the progress bar
                     for (Answer answer : newAnswers) {
+                        // If the progress bar is not null, update the progress bar
                         if (answer.getProgressBar() != null) {
                             int progress = (answer.getVotes() * 100) / totalVotes;
 //                            answer.getProgressBar().setMax(totalVotes);
-                            answer.getProgressBar().setProgress(progress);
+                            int currentProgress = answer.getProgressBar().getProgress();
+
+                            ObjectAnimator animation = ObjectAnimator.ofInt(answer.getProgressBar(), "progress", progress);
+                            animation.setDuration(900);
+                            animation.setInterpolator(new LinearInterpolator());
+                            animation.start();
+
+                            String countText = answer.getVotes() + " (" + progress + " %)" + " votes";
+                            mVoteCount.setText(countText);
                         }
                     }
                     mQuestion.setAnswers(newAnswers);
                 }
-
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {

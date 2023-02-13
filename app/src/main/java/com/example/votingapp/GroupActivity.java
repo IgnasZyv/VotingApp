@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +20,6 @@ public class GroupActivity extends AppCompatActivity {
     public static String groupId;
     private Group mGroup;
     private MenuProvider mMenuProvider;
-
 
     public GroupActivity() {
         super(R.layout.activity_fragment);
@@ -39,8 +37,6 @@ public class GroupActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
-
-
 
         Intent intent = getIntent();
         Bundle bundle = new Bundle();
@@ -70,7 +66,7 @@ public class GroupActivity extends AppCompatActivity {
                         startActivity(intent);
                         return true;
                     } else if (menuItem.getItemId() == R.id.join_group) {
-                        JoinGroupDialogFragment joinGroupDialogFragment = new JoinGroupDialogFragment();
+                        JoinGroupDialogFragment joinGroupDialogFragment = new JoinGroupDialogFragment(getApplicationContext());
                         joinGroupDialogFragment.show(getSupportFragmentManager(), "joinGroupDialogFragment");
                     }
 
@@ -82,7 +78,6 @@ public class GroupActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .add(R.id.fragment_container, GroupFragment.class, bundle)
-
                     .commit();
         }
 

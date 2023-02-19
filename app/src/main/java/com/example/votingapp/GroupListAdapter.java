@@ -3,7 +3,6 @@ package com.example.votingapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.Grou
     public void onBindViewHolder(@NonNull GroupHolder holder, int position) {
         Group group = mGroups.get(position);
 
-
+        group.getGroupEncryptionKey();
 
         holder.bind(group);
     }

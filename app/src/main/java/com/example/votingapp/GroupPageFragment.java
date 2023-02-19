@@ -1,7 +1,6 @@
 package com.example.votingapp;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -26,8 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,7 +38,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -177,8 +173,12 @@ public class GroupPageFragment extends Fragment {
         assert bundle != null;
         mGroup = (Group) bundle.getSerializable("group");
 
+        Log.d("GroupPageFragment", "updateUi: " + mGroup.getGroupEncryptionKey());
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
+
+
 
             ChildEventListener childEventListener = new ChildEventListener() {
                 ArrayList<Question> previousQuestions;
@@ -289,7 +289,7 @@ public class GroupPageFragment extends Fragment {
                     EditText editText = (EditText) child;
                     String answerText = editText.getText().toString();
                     if (!answerText.isEmpty()) {
-                        Answer answer = new Answer(editText.getText().toString());
+                        Answer answer = new Answer(editText.getText().toString(), group.getGroupEncryptionKey());
                         choices.add(answer);
                     } else {
                         Toast.makeText(getActivity(), "Empty answer", Toast.LENGTH_SHORT).show();
@@ -364,7 +364,7 @@ public class GroupPageFragment extends Fragment {
             mAnswerRecyclerView.setHasFixedSize(true);
 
             ArrayList<Answer> answers = new ArrayList<>(question.getAnswers());
-            AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, question, getContext());
+            AnswerListAdapter answerListAdapter = new AnswerListAdapter(answers, question, mGroup, getContext());
             answerListAdapter.setIsInDetailsView(false);
             mAnswerRecyclerView.setAdapter(answerListAdapter);
 
@@ -373,6 +373,7 @@ public class GroupPageFragment extends Fragment {
             int count = 0;
             Answer votedAnswer = null;
             for (Answer answer : question.getAnswers()) {
+                answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
                 if (!answer.getVoters().isEmpty()) {
                     // If the user's id is in the list of voters, remember the answer
                     Log.d("bind disable answer", "bind: " + answer.getVoters().toString() + " " + auth.getUid());
@@ -403,7 +404,7 @@ public class GroupPageFragment extends Fragment {
                 mSubmitButton.setText(R.string.voted);
                 mAnswerRecyclerView.setVisibility(View.GONE);
                 mVotedLayout.setVisibility(View.VISIBLE);
-                mAnswerTitleTextView.setText(votedAnswer.getAnswerTitle());
+                mAnswerTitleTextView.setText(votedAnswer.getDecryptedAnswerTitle());
                 question.setDisabled(true);
             }
 
@@ -431,6 +432,7 @@ public class GroupPageFragment extends Fragment {
                                         mPickedAnswer.incrementVotes();
                                         assert position != null;
 
+                                        // Update the question's answer list
                                         List<Answer> answersNew = question.getAnswers();
                                         answersNew.set(Integer.parseInt(position), mPickedAnswer);
                                         question.setAnswers(answersNew);
@@ -460,6 +462,7 @@ public class GroupPageFragment extends Fragment {
                 bundle.putSerializable("question", question);
                 bundle.putInt("position", getAdapterPosition());
                 bundle.putSerializable("answers", answers);
+                bundle.putSerializable("group", mGroup);
 
                 Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle(question.getTitle());
 

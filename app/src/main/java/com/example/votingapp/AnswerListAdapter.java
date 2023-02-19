@@ -3,14 +3,11 @@ package com.example.votingapp;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -19,8 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.utils.ColorTemplate;
@@ -39,6 +34,7 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
     public ArrayList<Answer> mAnswers;
     Context mContext;
     Question mQuestion;
+    Group mGroup;
     private int checkedPosition = -1;
     public Boolean mIsInDetailsView = false;
 
@@ -59,7 +55,8 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
         }
 
         public void bind(Answer answer) {
-            mAnswerTextView.setText(answer.getAnswerTitle());
+            answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
+            mAnswerTextView.setText(answer.getDecryptedAnswerTitle());
 //            mRadioButton.setText(getAdapterPosition());
             mRadioButton.setChecked(getAdapterPosition() == checkedPosition);
 
@@ -172,9 +169,10 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
 
     }
 
-    public AnswerListAdapter(ArrayList<Answer> answers, Question question, Context context) {
+    public AnswerListAdapter(ArrayList<Answer> answers, Question question, Group group, Context context) {
         this.mContext = context;
         this.mQuestion = question;
+        this.mGroup = group;
         this.mAnswers = answers;
     }
 

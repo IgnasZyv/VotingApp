@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +18,9 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -56,6 +53,7 @@ public class QuestionDetailFragment extends Fragment {
     private BarChart mBarChart;
     private PieChart mPieChart;
     private ViewPager2 mViewPager;
+    private Group mGroup;
 
     public QuestionDetailFragment() {
         super(R.layout.fragment_question_detail);
@@ -91,6 +89,7 @@ public class QuestionDetailFragment extends Fragment {
         Bundle bundle = getArguments();
         assert bundle != null;
         mQuestion = (Question) bundle.getSerializable("question");
+        mGroup = (Group) bundle.getSerializable("group");
         ArrayList<Answer> answers = (ArrayList<Answer>) mQuestion.getAnswers();
 
         RecyclerView answerRecyclerView = view.findViewById(R.id.recyclerView);
@@ -98,7 +97,8 @@ public class QuestionDetailFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         answerRecyclerView.setLayoutManager(layoutManager);
         answerRecyclerView.setHasFixedSize(true);
-        mAdapter = new AnswerListAdapter(answers, mQuestion, getContext());
+
+        mAdapter = new AnswerListAdapter(answers, mQuestion, mGroup,  getContext());
         mAdapter.setIsInDetailsView(true);
         answerRecyclerView.setAdapter(mAdapter);
 
@@ -210,8 +210,9 @@ public class QuestionDetailFragment extends Fragment {
 //        }
 
         for (Answer answer : answers) {
+            answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
             entries.add(new BarEntry(i, answer.getVotes()));
-            labels.add(answer.getAnswerTitle());
+            labels.add(answer.getDecryptedAnswerTitle());
             if (lowestValue == 0 || answer.getVotes() < lowestValue) {
                 lowestValue = answer.getVotes();
             }
@@ -264,7 +265,7 @@ public class QuestionDetailFragment extends Fragment {
     private void updatePieChart(List<Answer> answers) {
         List<PieEntry> entries = new ArrayList<>();
         for (Answer answer : answers) {
-            entries.add(new PieEntry(answer.getVotes(), answer.getAnswerTitle()));
+            entries.add(new PieEntry(answer.getVotes(), answer.getDecryptedAnswerTitle()));
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "Answers");
@@ -328,22 +329,7 @@ public class QuestionDetailFragment extends Fragment {
         mVoteCountQuery.addValueEventListener(mVoteCountListener);
     }
 
-    class AnswerTitleFormatter extends ValueFormatter {
 
-        private List<Answer> answers;
-
-        public AnswerTitleFormatter(List<Answer> answers) {
-            this.answers = answers;
-        }
-
-        @Override
-        public String getFormattedValue(float value) {
-            int index = Math.round(value);
-            Log.d("format", "getFormattedValue: " + index + " " + answers.size());
-            return answers.get(index).getAnswerTitle();
-
-        }
-    }
 
 
 }

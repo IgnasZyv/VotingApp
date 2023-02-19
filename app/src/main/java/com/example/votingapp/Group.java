@@ -1,6 +1,10 @@
 package com.example.votingapp;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.PropertyName;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,11 +22,18 @@ public class Group implements Serializable {
     private int mInviteCode = 0;
     private int mAdminInviteCode = 0;
 
+    private String GROUP_ENCRYPTION_KEY;
+
     public Group(){}
 
     public Group(String name) {
+        if (this.GROUP_ENCRYPTION_KEY == null) {
+            this.GROUP_ENCRYPTION_KEY = EncryptionUtils.getOrCreateEncryptionKey(mId);
+        }
         this.mName = name;
-        this.mId = UUID.randomUUID().toString();
+        if (this.mId == null) {
+            this.mId = UUID.randomUUID().toString();
+        }
         this.mMembers = new ArrayList<>();
         this.mAdministrators = new ArrayList<>();
         this.mQuestion = new HashMap<>();
@@ -116,13 +127,17 @@ public class Group implements Serializable {
         mQuestion.put(question.getId(), question);
     }
 
-//
-//    public Question getQuestion(String id) {
-//        for (Question question : mQuestion) {
-//            if (question.getId().equals(id)) {
-//                return question;
-//            }
-//        }
-//        return null;
-//    }
+    @Exclude
+    public String getGroupEncryptionKey() {
+        return GROUP_ENCRYPTION_KEY;
+    }
+
+    @Exclude
+    public void setGroupEncryptionKey(String groupEncryptionKey) throws JSONException {
+        // Parse the JSON string into a JSONObject
+        JSONObject json = new JSONObject(groupEncryptionKey);
+        // Extract the value of the "key" field
+        GROUP_ENCRYPTION_KEY = json.getString("key");
+    }
+
 }

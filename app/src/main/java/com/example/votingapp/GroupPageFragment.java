@@ -379,10 +379,10 @@ public class GroupPageFragment extends Fragment {
             Answer votedAnswer = null;
             for (Answer answer : question.getAnswers()) {
                 answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
-                if (!answer.getVoters().isEmpty()) {
+                if (!answer.getDecryptedVoters().isEmpty()) {
                     // If the user's id is in the list of voters, remember the answer
-                    Log.d("bind disable answer", "bind: " + answer.getVoters().toString() + " " + auth.getUid());
-                    if (answer.getVoters().contains(auth.getUid())) {
+                    Log.d("bind disable answer", "bind: " + answer.getDecryptedVoters().toString() + " " + auth.getUid());
+                    if (answer.getDecryptedVoters().contains(auth.getUid())) {
                         votedAnswer = answer;
                     }
                 }
@@ -434,8 +434,8 @@ public class GroupPageFragment extends Fragment {
 
                                     // If the answer is the same as the one that was checked
                                     if (mPickedAnswer != null && mPickedAnswer.getId().equals(answer.getId())) {
-                                        mPickedAnswer.addVoter(auth.getUid());
                                         mPickedAnswer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey()); // Set the group encryption key
+                                        mPickedAnswer.addVoter(auth.getUid());
                                         mPickedAnswer.incrementVotes();
                                         mPickedAnswer.getDecryptedVotes(); // Decrypt the votes
                                         assert position != null;

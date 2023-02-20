@@ -18,6 +18,7 @@ public class Answer implements Serializable {
     private String mId;
     private boolean isChecked;
     private ArrayList<String> mVoters;
+    private ArrayList<String> mDecryptedVoters;
     private ProgressBar mProgressBar;
     @Exclude
     private String mGroupEncryptionKey;
@@ -100,7 +101,19 @@ public class Answer implements Serializable {
         if (mVoters == null) {
             mVoters = new ArrayList<>();
         }
-        mVoters.add(voter);
+        String encryptedVoter = EncryptionUtils.encrypt(voter, mGroupEncryptionKey);
+        mVoters.add(encryptedVoter);
+    }
+
+    public ArrayList<String> getDecryptedVoters() {
+        mDecryptedVoters = new ArrayList<>();
+        if (mVoters != null) {
+            for (String voter : mVoters) {
+                String decryptedVoter = EncryptionUtils.decrypt(voter, mGroupEncryptionKey);
+                mDecryptedVoters.add(decryptedVoter);
+            }
+        }
+        return mDecryptedVoters;
     }
 
     public String getId() {

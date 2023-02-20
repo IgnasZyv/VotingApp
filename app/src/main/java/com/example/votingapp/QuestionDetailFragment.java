@@ -172,6 +172,7 @@ public class QuestionDetailFragment extends Fragment {
                     Answer answer = answerSnapshot.getValue(Answer.class);
                     assert answer != null;
                     answers.add(answer);
+                    answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
                     totalVoteCount += answer.getVotesAsInt();
                 }
                 String voteCountText = totalVoteCount + " votes";

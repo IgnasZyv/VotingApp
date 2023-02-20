@@ -172,7 +172,7 @@ public class QuestionDetailFragment extends Fragment {
                     Answer answer = answerSnapshot.getValue(Answer.class);
                     assert answer != null;
                     answers.add(answer);
-                    totalVoteCount += answer.getVotes();
+                    totalVoteCount += answer.getVotesAsInt();
                 }
                 String voteCountText = totalVoteCount + " votes";
                 mVoteCount.setText(voteCountText);
@@ -211,13 +211,13 @@ public class QuestionDetailFragment extends Fragment {
 
         for (Answer answer : answers) {
             answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
-            entries.add(new BarEntry(i, answer.getVotes()));
+            entries.add(new BarEntry(i, answer.getVotesAsInt()));
             labels.add(answer.getDecryptedAnswerTitle());
-            if (lowestValue == 0 || answer.getVotes() < lowestValue) {
-                lowestValue = answer.getVotes();
+            if (lowestValue == 0 || answer.getVotesAsInt() < lowestValue) {
+                lowestValue = answer.getVotesAsInt();
             }
-            if (highestValue == 0 || answer.getVotes() > highestValue) {
-                highestValue = answer.getVotes();
+            if (highestValue == 0 || answer.getVotesAsInt() > highestValue) {
+                highestValue = answer.getVotesAsInt();
             }
 
             i++;
@@ -265,7 +265,7 @@ public class QuestionDetailFragment extends Fragment {
     private void updatePieChart(List<Answer> answers) {
         List<PieEntry> entries = new ArrayList<>();
         for (Answer answer : answers) {
-            entries.add(new PieEntry(answer.getVotes(), answer.getDecryptedAnswerTitle()));
+            entries.add(new PieEntry(answer.getVotesAsInt(), answer.getDecryptedAnswerTitle()));
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "Answers");

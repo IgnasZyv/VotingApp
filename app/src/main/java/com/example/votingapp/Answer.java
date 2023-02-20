@@ -7,17 +7,19 @@ import com.google.firebase.database.PropertyName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Answer implements Serializable {
     private String mAnswerTitle;
     private String mDecryptedAnswerTitle;
-    private int mVotes;
-    private int mDecryptedVotes;
+    private String mVotes;
+    private String mDecryptedVotes;
     private String mId;
     private boolean isChecked;
     private ArrayList<String> mVoters;
     private ProgressBar mProgressBar;
+    @Exclude
     private String mGroupEncryptionKey;
 
     public Answer(){}
@@ -25,9 +27,10 @@ public class Answer implements Serializable {
     public Answer(String answerTitle, String groupEncryptionKey) {
         this.mAnswerTitle = EncryptionUtils.encrypt(answerTitle, groupEncryptionKey);
         this.isChecked = false;
-        this.mVotes = 0;
+        this.mVotes = Objects.requireNonNull(EncryptionUtils.encrypt("0", groupEncryptionKey));
         this.mId = UUID.randomUUID().toString();
         this.mVoters = new ArrayList<>();
+//        this.mGroupEncryptionKey = groupEncryptionKey;
     }
 
     @PropertyName("answerTitle")
@@ -57,29 +60,29 @@ public class Answer implements Serializable {
     }
 
     @PropertyName("votes")
-    public int getVotes() {
+    public String getVotes() {
         return mVotes;
     }
 
     @PropertyName("votes")
-    public void setVotes(int votes) {
+    public void setVotes(String votes) {
         mVotes = votes;
     }
 
     @Exclude
-    public int getDecryptedVotes() {
-        if (mDecryptedVotes == 0 && mVotes != 0) {
-            String decryptedVotes = EncryptionUtils.decrypt(String.valueOf(mVotes), mGroupEncryptionKey);
+    public String getDecryptedVotes() {
+        // If the decrypted votes are null or the decrypted votes are not equal to the encrypted votes
+        String decryptedVotes = EncryptionUtils.decrypt(mVotes, mGroupEncryptionKey);
+        if (mDecryptedVotes == null || !Objects.equals(decryptedVotes, mDecryptedVotes)) {
             if (decryptedVotes != null && !decryptedVotes.isEmpty()) {
-                mDecryptedVotes = Integer.parseInt(decryptedVotes);
+                this.mDecryptedVotes = decryptedVotes;
             }
         }
         return mDecryptedVotes;
     }
 
-
     public void incrementVotes() {
-        mVotes++;
+        mVotes = EncryptionUtils.encrypt(String.valueOf(Integer.parseInt(getDecryptedVotes()) + 1), mGroupEncryptionKey);
     }
 
     public ArrayList<String> getVoters() {
@@ -116,14 +119,19 @@ public class Answer implements Serializable {
         mProgressBar = progressBar;
     }
 
+    @Exclude
     public String getGroupEncryptionKey() {
         return mGroupEncryptionKey;
     }
+    @Exclude
     public void setGroupEncryptionKey(String key) {
         mGroupEncryptionKey = key;
     }
 
-
+    @Exclude
+    public int getVotesAsInt() {
+        return Integer.parseInt(getDecryptedVotes());
+    }
 }
 
 

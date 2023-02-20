@@ -268,28 +268,31 @@ public class GroupPageFragment extends Fragment {
     }
 
     private Boolean createQuestion() {
-
         ArrayList<Answer> choices = new ArrayList<>();
 
+        // Get the group
         Bundle bundle = getArguments();
         assert bundle != null;
         Group group = (Group) bundle.getSerializable("group");
 
         String questionTitle = mQuestionTitle.getText().toString();
+        // Check if the question title is empty
         if (questionTitle.isEmpty()) {
             Toast.makeText(getActivity(), "Question title is required", Toast.LENGTH_SHORT).show();
             return false;
         }
+        // for all the answers in the layout
         for (int i = 0; i < mAddAnswerLayout.getChildCount(); i++) {
-            View view = mAddAnswerLayout.getChildAt(i);
-            if (view instanceof LinearLayout) {
+            View view = mAddAnswerLayout.getChildAt(i); // get the view
+            if (view instanceof LinearLayout) { // if the view is a LinearLayout
                 LinearLayout answerLayout = (LinearLayout) view;
-                View child = answerLayout.getChildAt(0);
+                View child = answerLayout.getChildAt(0); // get the first child of the LinearLayout
                 if (child instanceof EditText) {
-                    EditText editText = (EditText) child;
-                    String answerText = editText.getText().toString();
+                    EditText editText = (EditText) child; // get the EditText
+                    String answerText = editText.getText().toString(); // get the answer text
                     if (!answerText.isEmpty()) {
                         Answer answer = new Answer(editText.getText().toString(), group.getGroupEncryptionKey());
+                        answer.setGroupEncryptionKey(group.getGroupEncryptionKey()); // set the group encryption key
                         choices.add(answer);
                     } else {
                         Toast.makeText(getActivity(), "Empty answer", Toast.LENGTH_SHORT).show();
@@ -299,8 +302,10 @@ public class GroupPageFragment extends Fragment {
             }
         }
 
+        // Create a question object for the database
         Question mQuestion = new Question(questionTitle, choices, group.getId());
 
+        // Add the question to the database as a child to the group id.
         mDAOQuestion.add(mQuestion, group.getId()).addOnSuccessListener(success -> {
             Toast.makeText(getActivity(), "Question created", Toast.LENGTH_SHORT).show();
             group.addQuestion(mQuestion);
@@ -381,7 +386,7 @@ public class GroupPageFragment extends Fragment {
                         votedAnswer = answer;
                     }
                 }
-                count += answer.getVotes();
+                count += answer.getVotesAsInt();
             }
             String concatCount = count + " votes";
             mAnswerCount.setText(concatCount);
@@ -418,29 +423,34 @@ public class GroupPageFragment extends Fragment {
                     .child(question.getId())
                     .child("answers");
 
-            mSubmitButton.setOnClickListener(v -> {
+            mSubmitButton.setOnClickListener(v -> { // Vote for an answer
                 for (Answer answer : answers) {
-                    if (answer.isChecked()) {
+                    if (answer.isChecked()) { // If the answer is checked
                         answerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 for (DataSnapshot ds : snapshot.getChildren()) {
-                                    String position = ds.getKey();
+                                    String position = ds.getKey(); // Get the position of the answer in the list
                                     mPickedAnswer = ds.getValue(Answer.class);
 
+                                    // If the answer is the same as the one that was checked
                                     if (mPickedAnswer != null && mPickedAnswer.getId().equals(answer.getId())) {
                                         mPickedAnswer.addVoter(auth.getUid());
+                                        mPickedAnswer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey()); // Set the group encryption key
                                         mPickedAnswer.incrementVotes();
+                                        mPickedAnswer.getDecryptedVotes(); // Decrypt the votes
                                         assert position != null;
 
-                                        // Update the question's answer list
-                                        List<Answer> answersNew = question.getAnswers();
-                                        answersNew.set(Integer.parseInt(position), mPickedAnswer);
-                                        question.setAnswers(answersNew);
+                                        List<Answer> answersNew = question.getAnswers(); // Update the question's answer list
 
+                                        answersNew.set(Integer.parseInt(position), mPickedAnswer); // Update the answer in the list
+                                        question.setAnswers(answersNew); // Set the new list of answers
+
+                                        // Update the votes in the database
                                         ds.getRef().child("votes").setValue(mPickedAnswer.getVotes());
+                                        // Update the question's answer list
                                         ds.getRef().child("voters").setValue(mPickedAnswer.getVoters());
 
-                                        mAdapter.notifyItemChanged(getAdapterPosition());
+                                        mAdapter.notifyItemChanged(getAdapterPosition()); // notify the adapter that the item has changed
                                         Toast.makeText(getActivity(), "Vote submitted", Toast.LENGTH_SHORT).show();
                                         answerQuery.removeEventListener(this);
                                     }

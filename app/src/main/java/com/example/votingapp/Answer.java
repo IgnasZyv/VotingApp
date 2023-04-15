@@ -31,7 +31,6 @@ public class Answer implements Serializable {
         this.mVotes = Objects.requireNonNull(EncryptionUtils.encrypt("0", groupEncryptionKey));
         this.mId = UUID.randomUUID().toString();
         this.mVoters = new ArrayList<>();
-//        this.mGroupEncryptionKey = groupEncryptionKey;
     }
 
     @PropertyName("answerTitle")

@@ -133,7 +133,8 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
                         }
                         count++;
                         // Add the answer to the list and update the total votes
-                        totalVotes += answer.getVotes();
+                        answer.setGroupEncryptionKey(mGroup.getGroupEncryptionKey());
+                        totalVotes += answer.getVotesAsInt();
                         newAnswers.add(answer);
                     }
 
@@ -141,7 +142,7 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
                     for (Answer answer : newAnswers) {
                         // If the progress bar is not null, update the progress bar
                         if (answer.getProgressBar() != null) {
-                            int progress = (answer.getVotes() * 100) / totalVotes;
+                            int progress = (answer.getVotesAsInt() * 100) / totalVotes;
 //                            answer.getProgressBar().setMax(totalVotes);
                             int currentProgress = answer.getProgressBar().getProgress();
 
@@ -150,7 +151,7 @@ public class AnswerListAdapter extends RecyclerView.Adapter<AnswerListAdapter.An
                             animation.setInterpolator(new LinearInterpolator());
                             animation.start();
 
-                            String countText = answer.getVotes() + " (" + progress + " %)" + " votes";
+                            String countText = answer.getDecryptedVotes() + " (" + progress + " %)" + " votes";
                             mVoteCount.setText(countText);
                         }
                     }

@@ -1,6 +1,5 @@
 package com.example.votingapp;
 
-import static android.icu.text.DateFormat.getDateInstance;
 import static android.icu.text.DateFormat.getDateTimeInstance;
 
 import android.os.Build;
@@ -115,7 +114,7 @@ public class Question implements Serializable {
     public int getVoteCount() {
         int count = 0;
         for (Answer answer : mAnswers) {
-            count += answer.getVotes();
+            count += answer.getVotesAsInt();
         }
         return count;
     }

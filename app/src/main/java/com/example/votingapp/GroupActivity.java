@@ -18,10 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Objects;
 
 public class GroupActivity extends AppCompatActivity {
-
     public static String groupId;
-    private Group mGroup;
-    private MenuProvider mMenuProvider;
 
     public GroupActivity() {
         super(R.layout.activity_fragment);
@@ -37,9 +34,10 @@ public class GroupActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
+        // if the user is not logged in, go to the login activity
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             Intent intent = new Intent(this, LogInActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -51,9 +49,9 @@ public class GroupActivity extends AppCompatActivity {
         groupId = intent.getStringExtra("groupId");
 
         if (intent.getSerializableExtra("group") != null) {
-            mGroup = (Group) intent.getSerializableExtra("group");
-            Objects.requireNonNull(getSupportActionBar()).setTitle(mGroup.getName());
-            bundle.putSerializable("group", mGroup);
+            Group group = (Group) intent.getSerializableExtra("group");
+            Objects.requireNonNull(getSupportActionBar()).setTitle(group.getName());
+            bundle.putSerializable("group", group);
         }
 
         if (bundle.getSerializable("group") == null) {

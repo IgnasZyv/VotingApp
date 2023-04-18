@@ -32,11 +32,7 @@ import java.util.Objects;
 public class GroupFragment extends Fragment {
     public GroupListAdapter mAdapter;
     public RecyclerView mGroupRecyclerView;
-//    private List<Group> mGroups;
-
-    private DAOGroup mDAOGroup;
     private ArrayList<Group> mGroups;
-    private GroupListAdapter mGroupListAdapter;
 
     public GroupFragment() {
         super(R.layout.fragment_group);
@@ -45,25 +41,6 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    private void loadData() {
-
-//        mDAOGroup.get().addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot ds : snapshot.getChildren()) {
-//                    Group group = ds.getValue(Group.class);
-//                    mGroups.add(group);
-//                }
-//                mAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Log.e("GroupFragment", "loadPost:onCancelled", error.toException());
-//            }
-//        });
     }
 
     @Override
@@ -75,15 +52,12 @@ public class GroupFragment extends Fragment {
         TextView userEmail = v.findViewById(R.id.tv_user_email);
         userEmail.setText(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail());
 
-
-        mDAOGroup = new DAOGroup();
-
         mGroups = new ArrayList<>();
 
         mGroupRecyclerView = v.findViewById(R.id.rv_group);
 
-        mGroupListAdapter = new GroupListAdapter(mGroups, getContext());
-        mGroupRecyclerView.setAdapter(mGroupListAdapter);
+        GroupListAdapter groupListAdapter = new GroupListAdapter(mGroups, getContext());
+        mGroupRecyclerView.setAdapter(groupListAdapter);
 
         ImageButton createGroupButton = v.findViewById(R.id.btn_add_group);
         ImageButton signOutButton = v.findViewById(R.id.ib_sign_out);
@@ -121,13 +95,6 @@ public class GroupFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putString("group_name", "group_name");
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        updateUi();
-//    }
-
 
     private void updateUi() {
 
